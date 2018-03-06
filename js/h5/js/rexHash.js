@@ -501,4 +501,4 @@
 			val = arr.splice(idx, 1);
 		ret.set_any(din(val, null, this.space));
 	};
-}());
+})()

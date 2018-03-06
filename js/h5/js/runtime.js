@@ -190,7 +190,7 @@
 		this.objectcount = 0;
 		this.changelayout = null;
 		this.destroycallbacks = [];
-		this.event_stack = [];
+		// this.event_stack = [];
 		this.event_stack_index = -1;
 		this.localvar_stack = [[]];
 		this.localvar_stack_index = 0;
@@ -224,8 +224,8 @@
 		// this.actsBySid = {};
 		// this.varsBySid = {};
 		// this.blocksBySid = {};
-		this.running_layout = null;			// currently running layout
-		this.layer_canvas = null;			// for layers "render-to-texture"
+		// this.running_layout = null;
+		this.layer_canvas = null;
 		this.layer_ctx = null;
 		this.layer_tex = null;
 		this.layout_tex = null;
@@ -1486,7 +1486,7 @@
 			AppMobi["webview"]["execute"]("onGameReady();");
 	};
 	Runtime.prototype.tick = function (background_wake, timestamp, debug_step) {
-		if (!this.running_layout)
+		if (!running_layout)
 			return
 		var nowtime = cr.performance_now();
 		var logic_start = nowtime;
@@ -1620,9 +1620,9 @@
 			else {
 				this.aspect_scale = this.width / this.original_width;
 			}
-			if (this.running_layout) {
-				this.running_layout.scrollToX(this.running_layout.scrollX);
-				this.running_layout.scrollToY(this.running_layout.scrollY);
+			if (running_layout) {
+				running_layout.scrollToX(running_layout.scrollX);
+				running_layout.scrollToY(running_layout.scrollY);
 			}
 		}
 		else
@@ -1671,8 +1671,8 @@
 		}
 		for (i = 0, leni = eventsheets_by_index.length; i < leni; i++)
 			eventsheets_by_index[i].hasRun = false;
-		if (this.running_layout.event_sheet)
-			this.running_layout.event_sheet.run();
+		if (running_layout.event_sheet)
+			running_layout.event_sheet.run();
 		cr.clearArray(this.registered_collisions);
 		this.layout_first_tick = false;
 		this.isInOnDestroy++;		// prevent instance lists from being changed
@@ -1715,8 +1715,8 @@
 		}
 	};
 	Runtime.prototype.doChangeLayout = function (changeToLayout) {
-		var prev_layout = this.running_layout;
-		this.running_layout.stopRunning();
+		var prev_layout = running_layout;
+		running_layout.stopRunning();
 		var i, len, j, lenj, k, lenk, type, inst, binst;
 		if (this.glwrap) {
 			for (i = 0, len = types_by_index.length; i < len; i++) {
@@ -1800,16 +1800,16 @@
 		return this.dt1 * inst.my_timescale;
 	};
 	Runtime.prototype.draw = function () {
-		this.running_layout.draw(this.ctx);
+		running_layout.draw(this.ctx);
 		if (this.isDirectCanvas)
 			this.ctx["present"]();
 	};
 	Runtime.prototype.drawGL = function () {
 		if (this.enableFrontToBack) {
 			this.earlyz_index = 1;		// start from front, 1-based to avoid exactly equalling near plane Z value
-			this.running_layout.drawGL_earlyZPass(this.glwrap);
+			running_layout.drawGL_earlyZPass(this.glwrap);
 		}
-		this.running_layout.drawGL(this.glwrap);
+		running_layout.drawGL(this.glwrap);
 		this.glwrap.present();
 	};
 	Runtime.prototype.addDestroyCallback = function (f) {
@@ -2214,8 +2214,8 @@
 	};
 	Runtime.prototype.getLayerByName = function (layer_name) {
 		var i, len;
-		for (i = 0, len = this.running_layout.layers.length; i < len; i++) {
-			var layer = this.running_layout.layers[i];
+		for (i = 0, len = running_layout.layers.length; i < len; i++) {
+			var layer = running_layout.layers[i];
 			if (cr.equals_nocase(layer.name, layer_name))
 				return layer;
 		}
@@ -2225,9 +2225,9 @@
 		index = cr.floor(index);
 		if (index < 0)
 			index = 0;
-		if (index >= this.running_layout.layers.length)
-			index = this.running_layout.layers.length - 1;
-		return this.running_layout.layers[index];
+		if (index >= running_layout.layers.length)
+			index = running_layout.layers.length - 1;
+		return running_layout.layers[index];
 	};
 	Runtime.prototype.getLayer = function (l) {
 		if (cr.is_number(l))
@@ -2916,9 +2916,9 @@
 	var triggerSheetIndex = -1;
 	Runtime.prototype.trigger = function (method, inst, value) {
 		// console.log('Runtime.prototype.trigger')
-		if (!this.running_layout)
+		if (!running_layout)
 			return false;
-		var sheet = this.running_layout.event_sheet;
+		var sheet = running_layout.event_sheet;
 		if (!sheet)
 			return false;
 		var ret = false;
@@ -3074,8 +3074,8 @@
 	};
 	Runtime.prototype.pushEventStack = function (cur_event) {
 		this.event_stack_index++;
-		if (this.event_stack_index >= this.event_stack.length)
-			this.event_stack.push(new cr.eventStackFrame());
+		if (this.event_stack_index >= event_stack.length)
+			event_stack.push(new cr.eventStackFrame());
 		var ret = this.getCurrentEventStack();
 		ret.reset(cur_event);
 		return ret;
@@ -3085,7 +3085,7 @@
 		this.event_stack_index--;
 	};
 	Runtime.prototype.getCurrentEventStack = function () {
-		return this.event_stack[this.event_stack_index];
+		return event_stack[this.event_stack_index];
 	};
 	Runtime.prototype.pushLoopStack = function (name_) {
 		this.loop_stack_index++;
@@ -3368,7 +3368,7 @@
 				"tickcount": this.tickcount,
 				"execcount": this.execcount,
 				"next_uid": this.next_uid,
-				"running_layout": this.running_layout.sid,
+				"running_layout": running_layout.sid,
 				"start_time_offset": (Date.now() - this.start_time)
 			},
 			"types": {},
@@ -3467,7 +3467,7 @@
 		this.execcount = rt["execcount"];
 		this.start_time = Date.now() - rt["start_time_offset"];
 		var layout_sid = rt["running_layout"];
-		if (layout_sid !== this.running_layout.sid) {
+		if (layout_sid !== running_layout.sid) {
 			var changeToLayout = this.getLayoutBySid(layout_sid);
 			if (changeToLayout)
 				this.doChangeLayout(changeToLayout);
@@ -3495,7 +3495,7 @@
 				for (i = existing_insts.length, len = load_insts.length; i < len; i++) {
 					layer = null;
 					if (type.plugin.is_world) {
-						layer = this.running_layout.getLayerBySid(load_insts[i]["w"]["l"]);
+						layer = running_layout.getLayerBySid(load_insts[i]["w"]["l"]);
 						if (!layer)
 							continue;
 					}
@@ -3704,7 +3704,7 @@
 			world = o["w"];
 			if (inst.layer.sid !== world["l"]) {
 				oldlayer = inst.layer;
-				inst.layer = this.running_layout.getLayerBySid(world["l"]);
+				inst.layer = running_layout.getLayerBySid(world["l"]);
 				if (inst.layer) {
 					oldlayer.removeFromInstanceList(inst, true);
 					inst.layer.appendToInstanceList(inst, true);
@@ -3851,4 +3851,4 @@
 		return new Runtime(canvas);
 	}
 	window.cr_createRuntime = cr.createRuntime;
-}());
+})()

@@ -126,4 +126,4 @@
 		ret.set_float(t ? t.duration : 0);
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()

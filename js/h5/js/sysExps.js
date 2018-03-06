@@ -592,7 +592,7 @@
 			return;		// cannot change layout while loading on loader layout
 		if (this.runtime.changelayout)
 			return;		// already changing to a different layout
-		var index = layouts_by_index.indexOf(this.runtime.running_layout);
+		var index = layouts_by_index.indexOf(running_layout);
 		if (prev && index === 0)
 			return;		// cannot go to previous layout from first layout
 		if (!prev && index === layouts_by_index.length - 1)
@@ -666,29 +666,29 @@
 		}
 	};
 	SysActs.prototype.SetLayoutScale = function (s) {
-		if (!this.runtime.running_layout)
+		if (!running_layout)
 			return;
-		if (this.runtime.running_layout.scale !== s) {
-			this.runtime.running_layout.scale = s;
-			this.runtime.running_layout.boundScrolling();
+		if (running_layout.scale !== s) {
+			running_layout.scale = s;
+			running_layout.boundScrolling();
 			this.runtime.redraw = true;
 		}
 	};
 	SysActs.prototype.ScrollX = function (x) {
-		this.runtime.running_layout.scrollToX(x);
+		running_layout.scrollToX(x);
 	};
 	SysActs.prototype.ScrollY = function (y) {
-		this.runtime.running_layout.scrollToY(y);
+		running_layout.scrollToY(y);
 	};
 	SysActs.prototype.Scroll = function (x, y) {
-		this.runtime.running_layout.scrollToX(x);
-		this.runtime.running_layout.scrollToY(y);
+		running_layout.scrollToX(x);
+		running_layout.scrollToY(y);
 	};
 	SysActs.prototype.ScrollToObject = function (obj) {
 		var inst = obj.getFirstPicked();
 		if (inst) {
-			this.runtime.running_layout.scrollToX(inst.x);
-			this.runtime.running_layout.scrollToY(inst.y);
+			running_layout.scrollToX(inst.x);
+			running_layout.scrollToY(inst.y);
 		}
 	};
 	SysActs.prototype.SetVar = function (v, x) {
@@ -882,9 +882,9 @@
 	SysActs.prototype.SetLayoutAngle = function (a) {
 		a = cr.to_radians(a);
 		a = cr.clamp_angle(a);
-		if (this.runtime.running_layout) {
-			if (this.runtime.running_layout.angle !== a) {
-				this.runtime.running_layout.angle = a;
+		if (running_layout) {
+			if (running_layout.angle !== a) {
+				running_layout.angle = a;
 				this.runtime.redraw = true;
 			}
 		}
@@ -971,9 +971,9 @@
 		if (this.runtime.changelayout)
 			return;		// already changing to a different layout
 		;
-		if (!this.runtime.running_layout)
+		if (!running_layout)
 			return;
-		this.runtime.changelayout = this.runtime.running_layout;
+		this.runtime.changelayout = running_layout;
 		var i, len, g;
 		for (i = 0, len = allGroups.length; i < len; i++) {
 			g = allGroups[i];
@@ -1000,16 +1000,16 @@
 		}
 	};
 	SysActs.prototype.SetLayoutEffectEnabled = function (enable_, effectname_) {
-		if (!this.runtime.running_layout || !this.runtime.glwrap)
+		if (!running_layout || !this.runtime.glwrap)
 			return;
-		var et = this.runtime.running_layout.getEffectByName(effectname_);
+		var et = running_layout.getEffectByName(effectname_);
 		if (!et)
 			return;		// effect name not found
 		var enable = (enable_ === 1);
 		if (et.active == enable)
 			return;		// no change
 		et.active = enable;
-		this.runtime.running_layout.updateActiveEffects();
+		running_layout.updateActiveEffects();
 		this.runtime.redraw = true;
 	};
 	SysActs.prototype.SetLayerEffectEnabled = function (layer, enable_, effectname_) {
@@ -1026,12 +1026,12 @@
 		this.runtime.redraw = true;
 	};
 	SysActs.prototype.SetLayoutEffectParam = function (effectname_, index_, value_) {
-		if (!this.runtime.running_layout || !this.runtime.glwrap)
+		if (!running_layout || !this.runtime.glwrap)
 			return;
-		var et = this.runtime.running_layout.getEffectByName(effectname_);
+		var et = running_layout.getEffectByName(effectname_);
 		if (!et)
 			return;		// effect name not found
-		var params = this.runtime.running_layout.effect_params[et.index];
+		var params = running_layout.effect_params[et.index];
 		index_ = Math.floor(index_);
 		if (index_ < 0 || index_ >= params.length)
 			return;		// effect index out of bounds
@@ -1090,7 +1090,7 @@
 	SysActs.prototype.RecreateInitialObjects = function (obj, x1, y1, x2, y2) {
 		if (!obj)
 			return;
-		this.runtime.running_layout.recreateInitialObjects(obj, x1, y1, x2, y2);
+		running_layout.recreateInitialObjects(obj, x1, y1, x2, y2);
 	};
 	SysActs.prototype.SetPixelRounding = function (m) {
 		this.runtime.pixel_rounding = (m !== 0);
@@ -1126,7 +1126,7 @@
 		var pickedInstances = sol.getObjects();
 		var zOrderList = [];
 		var instValues = [];
-		var layout = this.runtime.running_layout;
+		var layout = running_layout;
 		var isFamily = obj.is_family;
 		var familyIndex = obj.family_index;
 		for (i = 0, len = pickedInstances.length; i < len; ++i) {
@@ -1319,10 +1319,10 @@
 		ret.set_float(cr.to_degrees(cr.angleTo(x1, y1, x2, y2)));
 	};
 	SysExps.prototype.scrollx = function (ret) {
-		ret.set_float(this.runtime.running_layout.scrollX);
+		ret.set_float(running_layout.scrollX);
 	};
 	SysExps.prototype.scrolly = function (ret) {
-		ret.set_float(this.runtime.running_layout.scrollY);
+		ret.set_float(running_layout.scrollY);
 	};
 	SysExps.prototype.newline = function (ret) {
 		ret.set_string("\n");
@@ -1402,13 +1402,13 @@
 			ret.set_int(layer.index);
 	};
 	SysExps.prototype.layoutscale = function (ret) {
-		if (this.runtime.running_layout)
-			ret.set_float(this.runtime.running_layout.scale);
+		if (running_layout)
+			ret.set_float(running_layout.scale);
 		else
 			ret.set_float(0);
 	};
 	SysExps.prototype.layoutangle = function (ret) {
-		ret.set_float(cr.to_degrees(this.runtime.running_layout.angle));
+		ret.set_float(cr.to_degrees(running_layout.angle));
 	};
 	SysExps.prototype.layerangle = function (ret, layerparam) {
 		var layer = this.runtime.getLayer(layerparam);
@@ -1418,10 +1418,10 @@
 			ret.set_float(cr.to_degrees(layer.angle));
 	};
 	SysExps.prototype.layoutwidth = function (ret) {
-		ret.set_int(this.runtime.running_layout.width);
+		ret.set_int(running_layout.width);
 	};
 	SysExps.prototype.layoutheight = function (ret) {
-		ret.set_int(this.runtime.running_layout.height);
+		ret.set_int(running_layout.height);
 	};
 	SysExps.prototype.find = function (ret, text, searchstr) {
 		if (cr.is_string(text) && cr.is_string(searchstr))
@@ -1475,8 +1475,8 @@
 		ret.set_float(cr.PI);
 	};
 	SysExps.prototype.layoutname = function (ret) {
-		if (this.runtime.running_layout)
-			ret.set_string(this.runtime.running_layout.name);
+		if (running_layout)
+			ret.set_string(running_layout.name);
 		else
 			ret.set_string("");
 	};
@@ -1690,4 +1690,4 @@
 		}
 		cr.truncateArray(this.waits, j);
 	};
-}());
+})()

@@ -130,4 +130,4 @@
 	function Exps() {
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

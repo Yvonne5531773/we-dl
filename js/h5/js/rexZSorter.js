@@ -129,4 +129,4 @@
 	Exps.prototype.CmpUIDB = function (ret) {
 		ret.set_int(this._cmp_uidB);
 	};
-}());
+})()

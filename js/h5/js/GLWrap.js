@@ -1472,4 +1472,4 @@
 	};
 	console.log('cr2', cr)
 	cr.GLWrap = GLWrap_;
-}());
+})()

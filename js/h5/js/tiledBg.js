@@ -170,4 +170,4 @@
 		ret.set_float(this.texture_img.height);
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

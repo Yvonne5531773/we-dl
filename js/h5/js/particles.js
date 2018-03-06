@@ -495,4 +495,4 @@
 		ret.set_float(this.timeout);
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

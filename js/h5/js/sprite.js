@@ -1081,4 +1081,4 @@
 		ret.set_float(this.curFrame.height);
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

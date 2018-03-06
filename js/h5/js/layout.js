@@ -102,7 +102,7 @@
 			;
 			this.event_sheet.updateDeepIncludes();
 		}
-		this.runtime.running_layout = this;
+		running_layout = this;
 		this.width = this.originalWidth;
 		this.height = this.originalHeight;
 		this.scrollX = (this.runtime.original_width / 2);
@@ -1739,4 +1739,4 @@
 		this.zindices_stale = true;
 	};
 	cr.layer = Layer;
-}());
+})()

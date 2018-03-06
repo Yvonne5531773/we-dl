@@ -1331,4 +1331,4 @@
 	exps.isPaused = function (ret) {
 		ret.set_int(this.isPaused ? 1 : 0);
 	};
-}());
+})()

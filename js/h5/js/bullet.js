@@ -204,4 +204,4 @@
 		ret.set_float(this.g);
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()

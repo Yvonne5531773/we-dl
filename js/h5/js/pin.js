@@ -144,4 +144,4 @@
 		ret.set_int(this.pinObject ? this.pinObject.uid : -1);
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()

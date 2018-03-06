@@ -269,4 +269,4 @@
 		ret.set_string(fixedStringFromCharCode(kc));
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

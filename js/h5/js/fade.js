@@ -167,4 +167,4 @@
 		ret.set_float(this.fadeOutTime);
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()

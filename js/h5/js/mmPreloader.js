@@ -376,7 +376,7 @@
 		for (i = 0; i < objectPreloadQueue.length; i++) {
 			if (!objectPreloadQueue[i].isPreloaded) {
 				isLastItem = i === objectPreloadQueue.length - 1;
-				var inst = dis_.runtime.createInstance(objectPreloadQueue[i].object, dis_.runtime.running_layout.layers[0], 0, 0);
+				var inst = dis_.runtime.createInstance(objectPreloadQueue[i].object, running_layout.layers[0], 0, 0);
 				if (inst) {
 					if (cr.plugins_.Spriter && inst.type.plugin instanceof cr.plugins_.Spriter) {
 						spriterInst = inst;
@@ -456,4 +456,4 @@
 	function preloaderLog(message_, dis_) {
 		MM_Debugger ? MM_Debugger.log(0, message_, THIS_TAG, dis_) : console.log(message_);
 	}
-}());
+})()

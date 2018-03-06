@@ -362,8 +362,8 @@
 		for (i = 0, len = this.contained_includes.length; i < len; ++i) {
 			this.contained_includes[i].updateActive();
 		}
-		if (len > 0 && this.runtime.running_layout.event_sheet)
-			this.runtime.running_layout.event_sheet.updateDeepIncludes();
+		if (len > 0 && running_layout.event_sheet)
+			running_layout.event_sheet.updateDeepIncludes();
 	};
 
 	function addSolModifierToList(type, arr) {
@@ -1264,4 +1264,4 @@
 		return false;
 	};
 	cr.eventStackFrame = EventStackFrame;
-}());
+})()

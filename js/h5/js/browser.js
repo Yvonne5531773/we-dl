@@ -656,4 +656,4 @@
 		ret.set_int(window.outerHeight);
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

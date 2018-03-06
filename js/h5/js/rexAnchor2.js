@@ -168,4 +168,4 @@
 	function Exps() {
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()

@@ -282,4 +282,4 @@
 		ret.set_string(this.curTag);
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

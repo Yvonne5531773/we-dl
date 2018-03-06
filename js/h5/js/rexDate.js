@@ -152,4 +152,4 @@
 	Exps.prototype.LocalExpression = function (ret, timestamp, locales) {
 		ret.set_string(getDate(timestamp).toLocaleString(locales));
 	};
-}());
+})()

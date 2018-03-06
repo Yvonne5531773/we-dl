@@ -94,4 +94,4 @@
 		this.enabled = (e !== 0);
 	};
 	behaviorProto.acts = new Acts();
-}());
+})()

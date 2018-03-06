@@ -2773,4 +2773,4 @@
 		ret.set_float(context ? context.currentTime : cr.performance_now());
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

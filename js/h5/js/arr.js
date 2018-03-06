@@ -624,4 +624,4 @@
 		ret.set_string(this.getAsJSON());
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

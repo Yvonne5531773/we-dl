@@ -278,4 +278,4 @@
 		ret.set_float(this.waveFunc(this.i) * this.mag);
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()

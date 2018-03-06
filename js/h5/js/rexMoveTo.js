@@ -317,4 +317,4 @@
 	Exps.prototype.MovingAngleStart = function (ret) {
 		ret.set_float(this.movingAngleStartData["a"]);
 	};
-}());
+})()

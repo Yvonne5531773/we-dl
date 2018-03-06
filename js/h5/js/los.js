@@ -202,4 +202,4 @@
 		ret.set_float(cr.to_degrees(this.cone));
 	};
 	behaviorProto.exps = new Exps();
-}());
+})()
