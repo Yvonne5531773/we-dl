@@ -65,6 +65,24 @@ window.cr_setSuspended = function(s) {
 		runtime["setSuspended"](s);
 }
 
+window.types_by_index = []
+window.layouts = {}
+window.layouts_by_index = []
+window.eventsheets = {}
+window.eventsheets_by_index = []
+window.triggers_to_postinit = []
+window.groups_by_name = {}
+window.actsBySid = {}
+window.allGroups = []
+window.all_global_vars = []
+window.all_local_vars = []
+window.blocksBySid = {}
+window.varsBySid = {}
+window.cndsBySid = {}
+window.event_stack = []
+
+
+
 if (typeof Object.getPrototypeOf !== "function") {
 	if (typeof "test".__proto__ === "object") {
 		Object.getPrototypeOf = function (object) {

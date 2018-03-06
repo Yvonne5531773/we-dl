@@ -407,7 +407,7 @@
 		return cr.do_cmp(v.getValue(), cmp, val);
 	};
 	SysCnds.prototype.IsGroupActive = function (group) {
-		var g = this.runtime.groups_by_name[group.toLowerCase()];
+		var g = groups_by_name[group.toLowerCase()];
 		return g && g.group_active;
 	};
 	SysCnds.prototype.IsPreview = function () {
@@ -592,12 +592,12 @@
 			return;		// cannot change layout while loading on loader layout
 		if (this.runtime.changelayout)
 			return;		// already changing to a different layout
-		var index = this.runtime.layouts_by_index.indexOf(this.runtime.running_layout);
+		var index = layouts_by_index.indexOf(this.runtime.running_layout);
 		if (prev && index === 0)
 			return;		// cannot go to previous layout from first layout
-		if (!prev && index === this.runtime.layouts_by_index.length - 1)
+		if (!prev && index === layouts_by_index.length - 1)
 			return;		// cannot go to next layout from last layout
-		var to = this.runtime.layouts_by_index[index + (prev ? -1 : 1)];
+		var to = layouts_by_index[index + (prev ? -1 : 1)];
 		;
 		this.runtime.changelayout = to;
 	};
@@ -723,7 +723,7 @@
 		}
 	};
 	SysActs.prototype.SetGroupActive = function (group, active) {
-		var g = this.runtime.groups_by_name[group.toLowerCase()];
+		var g = groups_by_name[group.toLowerCase()];
 		if (!g)
 			return;
 		switch (active) {
@@ -816,8 +816,8 @@
 		waitobj.signalled = false;
 		waitobj.ev = evinfo.current_event;
 		waitobj.actindex = evinfo.actindex + 1;	// pointing at next action
-		for (i = 0, len = this.runtime.types_by_index.length; i < len; i++) {
-			t = this.runtime.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			t = types_by_index[i];
 			s = t.getCurrentSol();
 			if (s.select_all && evinfo.current_event.solModifiers.indexOf(t) === -1)
 				continue;
@@ -839,8 +839,8 @@
 		waitobj.signalled = false;
 		waitobj.ev = evinfo.current_event;
 		waitobj.actindex = evinfo.actindex + 1;	// pointing at next action
-		for (i = 0, len = this.runtime.types_by_index.length; i < len; i++) {
-			t = this.runtime.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			t = types_by_index[i];
 			s = t.getCurrentSol();
 			if (s.select_all && evinfo.current_event.solModifiers.indexOf(t) === -1)
 				continue;
@@ -874,8 +874,8 @@
 	};
 	SysActs.prototype.ResetGlobals = function () {
 		var i, len, g;
-		for (i = 0, len = this.runtime.all_global_vars.length; i < len; i++) {
-			g = this.runtime.all_global_vars[i];
+		for (i = 0, len = all_global_vars.length; i < len; i++) {
+			g = all_global_vars[i];
 			g.data = g.initial;
 		}
 	};
@@ -958,9 +958,9 @@
 			return;		// already changing to different layout
 		;
 		var l;
-		for (l in this.runtime.layouts) {
-			if (this.runtime.layouts.hasOwnProperty(l) && cr.equals_nocase(l, layoutname)) {
-				this.runtime.changelayout = this.runtime.layouts[l];
+		for (l in layouts) {
+			if (layouts.hasOwnProperty(l) && cr.equals_nocase(l, layoutname)) {
+				this.runtime.changelayout = layouts[l];
 				return;
 			}
 		}
@@ -975,8 +975,8 @@
 			return;
 		this.runtime.changelayout = this.runtime.running_layout;
 		var i, len, g;
-		for (i = 0, len = this.runtime.allGroups.length; i < len; i++) {
-			g = this.runtime.allGroups[i];
+		for (i = 0, len = allGroups.length; i < len; i++) {
+			g = allGroups[i];
 			g.setGroupActive(g.initially_activated);
 		}
 	};
@@ -1082,9 +1082,9 @@
 	};
 	SysActs.prototype.ResetPersisted = function () {
 		var i, len;
-		for (i = 0, len = this.runtime.layouts_by_index.length; i < len; ++i) {
-			this.runtime.layouts_by_index[i].persist_data = {};
-			this.runtime.layouts_by_index[i].first_visit = true;
+		for (i = 0, len = layouts_by_index.length; i < len; ++i) {
+			layouts_by_index[i].persist_data = {};
+			layouts_by_index[i].first_visit = true;
 		}
 	};
 	SysActs.prototype.RecreateInitialObjects = function (obj, x1, y1, x2, y2) {
@@ -1669,7 +1669,7 @@
 			evinfo.cndindex = 0;
 			for (k in w.sols) {
 				if (w.sols.hasOwnProperty(k)) {
-					s = this.runtime.types_by_index[parseInt(k, 10)].getCurrentSol();
+					s = types_by_index[parseInt(k, 10)].getCurrentSol();
 					ss = w.sols[k];
 					s.select_all = ss.sa;
 					cr.shallowAssignArray(s.instances, ss.insts);

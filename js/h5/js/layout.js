@@ -29,7 +29,7 @@
 		this.initial_nonworld = [];
 		for (i = 0, len = im.length; i < len; i++) {
 			var inst = im[i];
-			var type = this.runtime.types_by_index[inst[1]];
+			var type = types_by_index[inst[1]];
 			;
 			if (!type.default_instance)
 				type.default_instance = inst;
@@ -98,7 +98,7 @@
 	var first_layout = true;
 	Layout.prototype.startRunning = function () {
 		if (this.sheetname) {
-			this.event_sheet = this.runtime.eventsheets[this.sheetname];
+			this.event_sheet = eventsheets[this.sheetname];
 			;
 			this.event_sheet.updateDeepIncludes();
 		}
@@ -108,8 +108,8 @@
 		this.scrollX = (this.runtime.original_width / 2);
 		this.scrollY = (this.runtime.original_height / 2);
 		var i, k, len, lenk, type, type_instances, inst, iid, t, s, p, q, type_data, layer;
-		for (i = 0, len = this.runtime.types_by_index.length; i < len; i++) {
-			type = this.runtime.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			type = types_by_index[i];
 			if (type.is_family)
 				continue;		// instances are only transferred for their real type
 			type_instances = type.instances;
@@ -202,8 +202,8 @@
 		this.runtime.changelayout = null;
 		this.runtime.ClearDeathRow();
 		if (this.runtime.ctx && !this.runtime.isDomFree) {
-			for (i = 0, len = this.runtime.types_by_index.length; i < len; i++) {
-				t = this.runtime.types_by_index[i];
+			for (i = 0, len = types_by_index.length; i < len; i++) {
+				t = types_by_index[i];
 				if (t.is_family || !t.instances.length || !t.preloadCanvas2D)
 					continue;
 				t.preloadCanvas2D(this.runtime.ctx);
@@ -228,7 +228,7 @@
 		var i, k, len, initial_inst, inst, type;
 		for (i = 0, k = 0, len = this.initial_nonworld.length; i < len; i++) {
 			initial_inst = this.initial_nonworld[i];
-			type = this.runtime.types_by_index[initial_inst[1]];
+			type = types_by_index[initial_inst[1]];
 			if (type.global) {
 				if (!type.is_contained) {
 					inst = this.runtime.createInstanceFromInit(initial_inst, null, true);
@@ -278,8 +278,8 @@
 			cr.clearArray(layer_instances);
 			this.layers[i].zindices_stale = true;
 		}
-		for (i = 0, leni = this.runtime.types_by_index.length; i < leni; i++) {
-			type = this.runtime.types_by_index[i];
+		for (i = 0, leni = types_by_index.length; i < leni; i++) {
+			type = types_by_index[i];
 			if (type.global || type.plugin.is_world || type.plugin.singleglobal || type.is_family)
 				continue;
 			for (j = 0, lenj = type.instances.length; j < lenj; j++)
@@ -889,8 +889,7 @@
 		this.created_globals = [];		// global object UIDs already created - for save/load to avoid recreating
 		for (i = 0, len = im.length; i < len; i++) {
 			var inst = im[i];
-			var type = this.runtime.types_by_index[inst[1]];
-			;
+			var type = types_by_index[inst[1]];
 			if (!type.default_instance) {
 				type.default_instance = inst;
 				type.default_layerindex = this.index;
@@ -945,7 +944,7 @@
 		var i, k, len, inst, initial_inst, type, keep, hasPersistBehavior;
 		for (i = 0, k = 0, len = this.initial_instances.length; i < len; i++) {
 			initial_inst = this.initial_instances[i];
-			type = this.runtime.types_by_index[initial_inst[1]];
+			type = types_by_index[initial_inst[1]];
 			;
 			hasPersistBehavior = this.runtime.typeHasPersistBehavior(type);
 			keep = true;
@@ -975,7 +974,7 @@
 	};
 	Layer.prototype.recreateInitialObjects = function (only_type, rc) {
 		var i, len, initial_inst, type, wm, x, y, inst, j, lenj, s;
-		var types_by_index = this.runtime.types_by_index;
+		var types_by_index = types_by_index;
 		var only_type_is_family = only_type.is_family;
 		var only_type_members = only_type.members;
 		for (i = 0, len = this.initial_instances.length; i < len; ++i) {

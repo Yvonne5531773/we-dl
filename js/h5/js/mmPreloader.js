@@ -144,9 +144,9 @@
 	};
 	Acts.prototype.AddFromLayoutByName = function (layoutName_) {
 		var l, layout;
-		for (l in this.runtime.layouts) {
-			if (this.runtime.layouts.hasOwnProperty(l) && cr.equals_nocase(l, layoutName_)) {
-				layout = this.runtime.layouts[l];
+		for (l in layouts) {
+			if (layouts.hasOwnProperty(l) && cr.equals_nocase(l, layoutName_)) {
+				layout = layouts[l];
 				break;
 			}
 		}

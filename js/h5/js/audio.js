@@ -1739,7 +1739,7 @@
 	};
 	var instanceProto = pluginProto.Instance.prototype;
 	instanceProto.onCreate = function () {
-		this.runtime.audioInstance = this;
+		// this.runtime.audioInstance = this;
 		timescale_mode = this.properties[0];	// 0 = off, 1 = sounds only, 2 = all
 		this.saveload = this.properties[1];		// 0 = all, 1 = sounds only, 2 = music only, 3 = none
 		this.playinbackground = (this.properties[2] !== 0);

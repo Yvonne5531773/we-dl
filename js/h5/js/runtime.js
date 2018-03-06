@@ -7,6 +7,13 @@
 
 	var systemObject = {}
 	var behaviors = []
+	var objectsByUid = {}
+	var types = {}
+	var objects_to_pretick = new cr.ObjectSet()
+	var objects_to_tick = new cr.ObjectSet()
+	var objects_to_tick2 = new cr.ObjectSet()
+	var audioInstance = null
+	
 	function Runtime(canvas) {
 		// console.log('runtime canvas', canvas)
 		if (!canvas || (!canvas.getContext && !canvas["dc"]))
@@ -137,17 +144,17 @@
 			};
 		}
 		// this.plugins = [];
-		this.types = {};
-		this.types_by_index = [];
+		// this.types = {};
+		// types_by_index = [];
 		// this.behaviors = [];
-		this.layouts = {};
-		this.layouts_by_index = [];
-		this.eventsheets = {};
-		this.eventsheets_by_index = [];
+		// this.layouts = {};
+		// layouts_by_index = [];
+		// this.eventsheets = {};
+		// this.eventsheets_by_index = [];
 		this.wait_for_textures = [];        // for blocking until textures loaded
-		this.triggers_to_postinit = [];
-		this.all_global_vars = [];
-		this.all_local_vars = [];
+		// this.triggers_to_postinit = [];
+		// this.all_global_vars = [];
+		// this.all_local_vars = [];
 		this.solidBehavior = null;
 		this.jumpthruBehavior = null;
 		this.shadowcasterBehavior = null;
@@ -202,21 +209,21 @@
 		this.loadingprogress = 0;
 		this.isNodeFullscreen = false;
 		this.stackLocalCount = 0;	// number of stack-based local vars for recursion
-		this.audioInstance = null;
+		// this.audioInstance = null;
 		this.had_a_click = false;
 		this.isInUserInputEvent = false;
-		this.objects_to_pretick = new cr.ObjectSet();
-		this.objects_to_tick = new cr.ObjectSet();
-		this.objects_to_tick2 = new cr.ObjectSet();
+		// this.objects_to_pretick = new cr.ObjectSet();
+		// this.objects_to_tick = new cr.ObjectSet();
+		// this.objects_to_tick2 = new cr.ObjectSet();
 		this.registered_collisions = [];
 		this.temp_poly = new cr.CollisionPoly([]);
 		this.temp_poly2 = new cr.CollisionPoly([]);
-		this.allGroups = [];				// array of all event groups
-		this.groups_by_name = {};
-		this.cndsBySid = {};
-		this.actsBySid = {};
-		this.varsBySid = {};
-		this.blocksBySid = {};
+		// this.allGroups = [];
+		// this.groups_by_name = {};
+		// this.cndsBySid = {};
+		// this.actsBySid = {};
+		// this.varsBySid = {};
+		// this.blocksBySid = {};
 		this.running_layout = null;			// currently running layout
 		this.layer_canvas = null;			// for layers "render-to-texture"
 		this.layer_ctx = null;
@@ -228,8 +235,8 @@
 		this.uses_background_blending = false;	// if any shader uses background blending, so entire layout renders to texture
 		this.fx_tex = [null, null];
 		this.fullscreen_scaling = 0;
-		this.files_subfolder = "";			// path with project files
-		this.objectsByUid = {};				// maps every in-use UID (as a string) to its instance
+		this.files_subfolder = "";			
+		// objectsByUid = {};	
 		this.loaderlogos = null;
 		this.snapshotCanvas = null;
 		this.snapshotData = "";
@@ -410,8 +417,8 @@
 			this.glwrap.setSize(canvas.width, canvas.height);
 			this.glwrap.enable_mipmaps = (this.downscalingQuality !== 0);
 			this.ctx = null;
-			for (i = 0, len = this.types_by_index.length; i < len; i++) {
-				t = this.types_by_index[i];
+			for (i = 0, len = types_by_index.length; i < len; i++) {
+				t = types_by_index[i];
 				for (j = 0, lenj = t.effect_types.length; j < lenj; j++) {
 					s = t.effect_types[j];
 					s.shaderindex = this.glwrap.getShaderIndex(s.id);
@@ -419,8 +426,8 @@
 					this.uses_background_blending = this.uses_background_blending || this.glwrap.programUsesDest(s.shaderindex);
 				}
 			}
-			for (i = 0, len = this.layouts_by_index.length; i < len; i++) {
-				l = this.layouts_by_index[i];
+			for (i = 0, len = layouts_by_index.length; i < len; i++) {
+				l = layouts_by_index[i];
 				for (j = 0, lenj = l.effect_types.length; j < lenj; j++) {
 					s = l.effect_types[j];
 					s.shaderindex = this.glwrap.getShaderIndex(s.id);
@@ -753,8 +760,8 @@
 		this.glwrap.contextLost();
 		this.is_WebGL_context_lost = true;
 		var i, len, t;
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			t = this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			t = types_by_index[i];
 			if (t.onLostWebGLContext)
 				t.onLostWebGLContext();
 		}
@@ -762,8 +769,8 @@
 	Runtime.prototype.onContextRestored = function () {
 		this.is_WebGL_context_lost = false;
 		var i, len, t;
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			t = this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			t = types_by_index[i];
 			if (t.onRestoreWebGLContext)
 				t.onRestoreWebGLContext();
 		}
@@ -916,7 +923,7 @@
 			type_inst.fx_count = m[5];
 			type_inst.sid = m[11];
 			if (type_inst.is_family) {
-				type_inst.members = [];				// types in this family
+				type_inst.members = [];
 				type_inst.family_index = this.family_count++;
 				type_inst.families = null;
 			}
@@ -1009,128 +1016,129 @@
 			type_inst.global = m[9];
 			type_inst.isOnLoaderLayout = m[10];
 			type_inst.effect_types = [];
-			// for (j = 0, lenj = m[12].length; j < lenj; j++) {
-			// 	type_inst.effect_types.push({
-			// 		id: m[12][j][0],
-			// 		name: m[12][j][1],
-			// 		shaderindex: -1,
-			// 		preservesOpaqueness: false,
-			// 		active: true,
-			// 		index: j
-			// 	});
-			// }
-			// type_inst.tile_poly_data = m[13];
-			// if (!this.uses_loader_layout || type_inst.is_family || type_inst.isOnLoaderLayout || !plugin.is_world) {
-			// 	type_inst.onCreate();
-			// 	cr.seal(type_inst);
-			// }
-			// if (type_inst.name)
-			// 	this.types[type_inst.name] = type_inst;
-			// this.types_by_index.push(type_inst);
-			// if (plugin.singleglobal) {
-			// 	var instance = new plugin.Instance(type_inst);
-			// 	instance.uid = this.next_uid++;
-			// 	instance.puid = this.next_puid++;
-			// 	instance.iid = 0;
-			// 	instance.get_iid = cr.inst_get_iid;
-			// 	instance.toString = cr.inst_toString;
-			// 	instance.properties = m[14];
-			// 	instance.onCreate();
-			// 	cr.seal(instance);
-			// 	type_inst.instances.push(instance);
-			// 	this.objectsByUid[instance.uid.toString()] = instance;
-			// }
+			for (j = 0, lenj = m[12].length; j < lenj; j++) {
+				type_inst.effect_types.push({
+					id: m[12][j][0],
+					name: m[12][j][1],
+					shaderindex: -1,
+					preservesOpaqueness: false,
+					active: true,
+					index: j
+				});
+			}
+			type_inst.tile_poly_data = m[13];
+			if (!this.uses_loader_layout || type_inst.is_family || type_inst.isOnLoaderLayout || !plugin.is_world) {
+				type_inst.onCreate();
+				cr.seal(type_inst);
+			}
+			if (type_inst.name)
+				types[type_inst.name] = type_inst;
+			types_by_index.push(type_inst);
+			if (plugin.singleglobal) {
+				var instance = new plugin.Instance(type_inst);
+				instance.uid = this.next_uid++;
+				instance.puid = this.next_puid++;
+				instance.iid = 0;
+				instance.get_iid = cr.inst_get_iid;
+				instance.toString = cr.inst_toString;
+				instance.properties = m[14];
+				instance.onCreate();
+				cr.seal(instance);
+				type_inst.instances.push(instance);
+				objectsByUid[instance.uid.toString()] = instance;
+			}
 		}
-		// for (i = 0, len = pm[4].length; i < len; i++) {
-		// 	var familydata = pm[4][i];
-		// 	var familytype = this.types_by_index[familydata[0]];
-		// 	var familymember;
-		// 	for (j = 1, lenj = familydata.length; j < lenj; j++) {
-		// 		familymember = this.types_by_index[familydata[j]];
-		// 		familymember.families.push(familytype);
-		// 		familytype.members.push(familymember);
-		// 	}
-		// }
-		// for (i = 0, len = pm[28].length; i < len; i++) {
-		// 	var containerdata = pm[28][i];
-		// 	var containertypes = [];
-		// 	for (j = 0, lenj = containerdata.length; j < lenj; j++)
-		// 		containertypes.push(this.types_by_index[containerdata[j]]);
-		// 	for (j = 0, lenj = containertypes.length; j < lenj; j++) {
-		// 		containertypes[j].is_contained = true;
-		// 		containertypes[j].container = containertypes;
-		// 	}
-		// }
-		// if (this.family_count > 0) {
-		// 	for (i = 0, len = this.types_by_index.length; i < len; i++) {
-		// 		t = this.types_by_index[i];
-		// 		if (t.is_family || !t.families.length)
-		// 			continue;
-		// 		t.family_var_map = new Array(this.family_count);
-		// 		t.family_beh_map = new Array(this.family_count);
-		// 		t.family_fx_map = new Array(this.family_count);
-		// 		var all_fx = [];
-		// 		var varsum = 0;
-		// 		var behsum = 0;
-		// 		var fxsum = 0;
-		// 		for (j = 0, lenj = t.families.length; j < lenj; j++) {
-		// 			f = t.families[j];
-		// 			t.family_var_map[f.family_index] = varsum;
-		// 			varsum += f.vars_count;
-		// 			t.family_beh_map[f.family_index] = behsum;
-		// 			behsum += f.behs_count;
-		// 			t.family_fx_map[f.family_index] = fxsum;
-		// 			fxsum += f.fx_count;
-		// 			for (k = 0, lenk = f.effect_types.length; k < lenk; k++)
-		// 				all_fx.push(cr.shallowCopy({}, f.effect_types[k]));
-		// 		}
-		// 		t.effect_types = all_fx.concat(t.effect_types);
-		// 		for (j = 0, lenj = t.effect_types.length; j < lenj; j++)
-		// 			t.effect_types[j].index = j;
-		// 	}
-		// }
-		// for (i = 0, len = pm[5].length; i < len; i++) {
-		// 	m = pm[5][i];
-		// 	var layout = new cr.layout(this, m);
-		// 	cr.seal(layout);
-		// 	this.layouts[layout.name] = layout;
-		// 	this.layouts_by_index.push(layout);
-		// }
-		// for (i = 0, len = pm[6].length; i < len; i++) {
-		// 	m = pm[6][i];
-		// 	var sheet = new cr.eventsheet(this, m);
-		// 	cr.seal(sheet);
-		// 	this.eventsheets[sheet.name] = sheet;
-		// 	this.eventsheets_by_index.push(sheet);
-		// }
-		// for (i = 0, len = this.eventsheets_by_index.length; i < len; i++)
-		// 	this.eventsheets_by_index[i].postInit();
-		// for (i = 0, len = this.eventsheets_by_index.length; i < len; i++)
-		// 	this.eventsheets_by_index[i].updateDeepIncludes();
-		// for (i = 0, len = this.triggers_to_postinit.length; i < len; i++)
-		// 	this.triggers_to_postinit[i].postInit();
-		// cr.clearArray(this.triggers_to_postinit)
-		// this.audio_to_preload = pm[7];
-		// this.files_subfolder = pm[8];
-		// this.pixel_rounding = pm[9];
-		// this.aspect_scale = 1.0;
-		// this.enableWebGL = pm[13];
-		// this.linearSampling = pm[14];
-		// this.clearBackground = pm[15];
-		// this.versionstr = pm[16];
-		// this.useHighDpi = pm[17];
-		// this.orientations = pm[20];		// 0 = any, 1 = portrait, 2 = landscape
-		// this.autoLockOrientation = (this.orientations > 0);
-		// this.pauseOnBlur = pm[22];
-		// this.wantFullscreenScalingQuality = pm[23];		// false = low quality, true = high quality
-		// this.fullscreenScalingQuality = this.wantFullscreenScalingQuality;
-		// this.downscalingQuality = pm[24];	// 0 = low (mips off), 1 = medium (mips on, dense spritesheet), 2 = high (mips on, sparse spritesheet)
-		// this.preloadSounds = pm[25];		// 0 = no, 1 = yes
-		// this.projectName = pm[26];
-		// this.enableFrontToBack = pm[27] && !this.isIE;		// front-to-back renderer disabled in IE (but not Edge)
-		// this.start_time = Date.now();
-		// cr.clearArray(this.objectRefTable);
-		// this.initRendererAndLoader();
+		for (i = 0, len = pm[4].length; i < len; i++) {
+			var familydata = pm[4][i];
+			var familytype = types_by_index[familydata[0]];
+			var familymember;
+			for (j = 1, lenj = familydata.length; j < lenj; j++) {
+				familymember = types_by_index[familydata[j]];
+				familymember.families.push(familytype);
+				familytype.members.push(familymember);
+			}
+		}
+		for (i = 0, len = pm[28].length; i < len; i++) {
+			var containerdata = pm[28][i];
+			var containertypes = [];
+			for (j = 0, lenj = containerdata.length; j < lenj; j++)
+				containertypes.push(types_by_index[containerdata[j]]);
+			for (j = 0, lenj = containertypes.length; j < lenj; j++) {
+				containertypes[j].is_contained = true;
+				containertypes[j].container = containertypes;
+			}
+		}
+		if (this.family_count > 0) {
+			for (i = 0, len = types_by_index.length; i < len; i++) {
+				t = types_by_index[i];
+				if (t.is_family || !t.families.length)
+					continue;
+				t.family_var_map = new Array(this.family_count);
+				t.family_beh_map = new Array(this.family_count);
+				t.family_fx_map = new Array(this.family_count);
+				var all_fx = [];
+				var varsum = 0;
+				var behsum = 0;
+				var fxsum = 0;
+				for (j = 0, lenj = t.families.length; j < lenj; j++) {
+					f = t.families[j];
+					t.family_var_map[f.family_index] = varsum;
+					varsum += f.vars_count;
+					t.family_beh_map[f.family_index] = behsum;
+					behsum += f.behs_count;
+					t.family_fx_map[f.family_index] = fxsum;
+					fxsum += f.fx_count;
+					for (k = 0, lenk = f.effect_types.length; k < lenk; k++)
+						all_fx.push(cr.shallowCopy({}, f.effect_types[k]));
+				}
+				t.effect_types = all_fx.concat(t.effect_types);
+				for (j = 0, lenj = t.effect_types.length; j < lenj; j++)
+					t.effect_types[j].index = j;
+			}
+		}
+		for (i = 0, len = pm[5].length; i < len; i++) {
+			m = pm[5][i];
+			var layout = new cr.layout(this, m);
+			cr.seal(layout);
+			layouts[layout.name] = layout;
+			layouts_by_index.push(layout);
+		}
+		for (i = 0, len = pm[6].length; i < len; i++) {
+			m = pm[6][i];
+			var sheet = new cr.eventsheet(this, m);
+			cr.seal(sheet);
+			eventsheets[sheet.name] = sheet;
+			eventsheets_by_index.push(sheet);
+		}
+		console.log('this', this)
+		for (i = 0, len = eventsheets_by_index.length; i < len; i++)
+			eventsheets_by_index[i].postInit();
+		for (i = 0, len = eventsheets_by_index.length; i < len; i++)
+			eventsheets_by_index[i].updateDeepIncludes();
+		for (i = 0, len = triggers_to_postinit.length; i < len; i++)
+			triggers_to_postinit[i].postInit();
+		cr.clearArray(triggers_to_postinit)
+		this.audio_to_preload = pm[7];
+		this.files_subfolder = pm[8];
+		this.pixel_rounding = pm[9];
+		this.aspect_scale = 1.0;
+		this.enableWebGL = pm[13];
+		this.linearSampling = pm[14];
+		this.clearBackground = pm[15];
+		this.versionstr = pm[16];
+		this.useHighDpi = pm[17];
+		this.orientations = pm[20];		// 0 = any, 1 = portrait, 2 = landscape
+		this.autoLockOrientation = (this.orientations > 0);
+		this.pauseOnBlur = pm[22];
+		this.wantFullscreenScalingQuality = pm[23];		// false = low quality, true = high quality
+		this.fullscreenScalingQuality = this.wantFullscreenScalingQuality;
+		this.downscalingQuality = pm[24];	// 0 = low (mips off), 1 = medium (mips on, dense spritesheet), 2 = high (mips on, sparse spritesheet)
+		this.preloadSounds = pm[25];		// 0 = no, 1 = yes
+		this.projectName = pm[26];
+		this.enableFrontToBack = pm[27] && !this.isIE;		// front-to-back renderer disabled in IE (but not Edge)
+		this.start_time = Date.now();
+		cr.clearArray(this.objectRefTable);
+		this.initRendererAndLoader();
 	}
 
 	var anyImageHadError = false;
@@ -1174,9 +1182,9 @@
 	var audio_preload_totalsize = 0;
 	var audio_preload_started = false;
 	Runtime.prototype.getready = function () {
-		if (!this.audioInstance)
+		if (!audioInstance)
 			return;
-		audio_preload_totalsize = this.audioInstance.setPreloadList(this.audio_to_preload);
+		audio_preload_totalsize = audioInstance.setPreloadList(this.audio_to_preload);
 	};
 	Runtime.prototype.areAllTexturesAndSoundsLoaded = function () {
 		var totalsize = audio_preload_totalsize;
@@ -1195,12 +1203,12 @@
 			else
 				ret = false;    // not all textures loaded
 		}
-		if (ret && this.preloadSounds && this.audioInstance) {
+		if (ret && this.preloadSounds && audioInstance) {
 			if (!audio_preload_started) {
-				this.audioInstance.startPreloads();
+				audioInstance.startPreloads();
 				audio_preload_started = true;
 			}
-			audiocompletedsize = this.audioInstance.getPreloadedSize();
+			audiocompletedsize = audioInstance.getPreloadedSize();
 			completedsize += audiocompletedsize;
 			if (audiocompletedsize < audio_preload_totalsize)
 				ret = false;		// not done yet
@@ -1429,8 +1437,8 @@
 		this.last_fps_time = cr.performance_now();       // for counting framerate
 		var i, len, t;
 		if (this.uses_loader_layout) {
-			for (i = 0, len = this.types_by_index.length; i < len; i++) {
-				t = this.types_by_index[i];
+			for (i = 0, len = types_by_index.length; i < len; i++) {
+				t = types_by_index[i];
 				if (!t.is_family && !t.isOnLoaderLayout && t.plugin.is_world) {
 					t.onCreate();
 					cr.seal(t);
@@ -1439,8 +1447,8 @@
 		}
 		else
 			this.isloading = false;
-		for (i = 0, len = this.layouts_by_index.length; i < len; i++) {
-			this.layouts_by_index[i].createGlobalNonWorlds();
+		for (i = 0, len = layouts_by_index.length; i < len; i++) {
+			layouts_by_index[i].createGlobalNonWorlds();
 		}
 		if (this.fullscreen_mode >= 2) {
 			var orig_aspect = this.original_width / this.original_height;
@@ -1451,9 +1459,9 @@
 				this.aspect_scale = this.width / this.original_width;
 		}
 		if (this.first_layout)
-			this.layouts[this.first_layout].startRunning();
+			layouts[this.first_layout].startRunning();
 		else
-			this.layouts_by_index[0].startRunning();
+			layouts_by_index[0].startRunning();
 		;
 		if (!this.uses_loader_layout) {
 			this.loadingprogress = 1;
@@ -1463,8 +1471,8 @@
 		}
 		if (navigator["splashscreen"] && navigator["splashscreen"]["hide"])
 			navigator["splashscreen"]["hide"]();
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			t = this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			t = types_by_index[i];
 			if (t.onAppBegin)
 				t.onAppBegin();
 		}
@@ -1625,11 +1633,11 @@
 		this.isInOnDestroy--;
 		this.ClearDeathRow();		// allow instance list changing
 		this.isInOnDestroy++;
-		var tickarr = this.objects_to_pretick.valuesRef();
+		var tickarr = objects_to_pretick.valuesRef();
 		for (i = 0, leni = tickarr.length; i < leni; i++)
 			tickarr[i].pretick();
-		for (i = 0, leni = this.types_by_index.length; i < leni; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, leni = types_by_index.length; i < leni; i++) {
+			type = types_by_index[i];
 			if (type.is_family || (!type.behaviors.length && !type.families.length))
 				continue;
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {
@@ -1639,8 +1647,8 @@
 				}
 			}
 		}
-		for (i = 0, leni = this.types_by_index.length; i < leni; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, leni = types_by_index.length; i < leni; i++) {
+			type = types_by_index[i];
 			if (type.is_family || (!type.behaviors.length && !type.families.length))
 				continue;	// type doesn't have any behaviors
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {
@@ -1652,7 +1660,7 @@
 				}
 			}
 		}
-		tickarr = this.objects_to_tick.valuesRef();
+		tickarr = objects_to_tick.valuesRef();
 		for (i = 0, leni = tickarr.length; i < leni; i++)
 			tickarr[i].tick();
 		this.isInOnDestroy--;		// end preventing instance lists from being changed
@@ -1661,15 +1669,15 @@
 		while (this.changelayout && i++ < 10) {
 			this.doChangeLayout(this.changelayout);
 		}
-		for (i = 0, leni = this.eventsheets_by_index.length; i < leni; i++)
-			this.eventsheets_by_index[i].hasRun = false;
+		for (i = 0, leni = eventsheets_by_index.length; i < leni; i++)
+			eventsheets_by_index[i].hasRun = false;
 		if (this.running_layout.event_sheet)
 			this.running_layout.event_sheet.run();
 		cr.clearArray(this.registered_collisions);
 		this.layout_first_tick = false;
 		this.isInOnDestroy++;		// prevent instance lists from being changed
-		for (i = 0, leni = this.types_by_index.length; i < leni; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, leni = types_by_index.length; i < leni; i++) {
+			type = types_by_index[i];
 			if (type.is_family || (!type.behaviors.length && !type.families.length))
 				continue;	// type doesn't have any behaviors
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {
@@ -1681,15 +1689,15 @@
 				}
 			}
 		}
-		tickarr = this.objects_to_tick2.valuesRef();
+		tickarr = objects_to_tick2.valuesRef();
 		for (i = 0, leni = tickarr.length; i < leni; i++)
 			tickarr[i].tick2();
 		this.isInOnDestroy--;		// end preventing instance lists from being changed
 	};
 	Runtime.prototype.onWindowBlur = function () {
 		var i, leni, j, lenj, k, lenk, type, inst, binst;
-		for (i = 0, leni = this.types_by_index.length; i < leni; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, leni = types_by_index.length; i < leni; i++) {
+			type = types_by_index[i];
 			if (type.is_family)
 				continue;
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {
@@ -1711,8 +1719,8 @@
 		this.running_layout.stopRunning();
 		var i, len, j, lenj, k, lenk, type, inst, binst;
 		if (this.glwrap) {
-			for (i = 0, len = this.types_by_index.length; i < len; i++) {
-				type = this.types_by_index[i];
+			for (i = 0, len = types_by_index.length; i < len; i++) {
+				type = types_by_index[i];
 				if (type.is_family)
 					continue;
 				if (type.unloadTextures && (!type.global || type.instances.length === 0) && changeToLayout.initial_types.indexOf(type) === -1) {
@@ -1743,8 +1751,8 @@
 					beh.onLayoutChange();
 			}
 		}
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			type = types_by_index[i];
 			if (!type.global && !type.plugin.singleglobal)
 				continue;
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {
@@ -1774,17 +1782,17 @@
 		}
 	};
 	Runtime.prototype.pretickMe = function (inst) {
-		this.objects_to_pretick.add(inst);
+		objects_to_pretick.add(inst);
 	};
 	Runtime.prototype.unpretickMe = function (inst) {
-		this.objects_to_pretick.remove(inst);
+		objects_to_pretick.remove(inst);
 	};
 	Runtime.prototype.tickMe = function (inst) {
-		this.objects_to_tick.add(inst);
+		objects_to_tick.add(inst);
 		// console.log('tickMe this.objects_to_tick',this.objects_to_tick)
 	};
 	Runtime.prototype.tick2Me = function (inst) {
-		this.objects_to_tick2.add(inst);
+		objects_to_tick2.add(inst);
 	};
 	Runtime.prototype.getDt = function (inst) {
 		if (!inst || inst.my_timescale === -1.0)
@@ -1814,8 +1822,8 @@
 	Runtime.prototype.getObjectByUID = function (uid_) {
 		;
 		var uidstr = uid_.toString();
-		if (this.objectsByUid.hasOwnProperty(uidstr))
-			return this.objectsByUid[uidstr];
+		if (objectsByUid.hasOwnProperty(uidstr))
+			return objectsByUid[uidstr];
 		else
 			return null;
 	};
@@ -1960,13 +1968,13 @@
 				binst.behavior.my_instances.remove(inst);
 			}
 		}
-		this.objects_to_pretick.remove(inst);
-		this.objects_to_tick.remove(inst);
-		this.objects_to_tick2.remove(inst);
+		objects_to_pretick.remove(inst);
+		objects_to_tick.remove(inst);
+		objects_to_tick2.remove(inst);
 		if (inst.onDestroy)
 			inst.onDestroy();
-		if (this.objectsByUid.hasOwnProperty(inst.uid.toString()))
-			delete this.objectsByUid[inst.uid.toString()];
+		if (objectsByUid.hasOwnProperty(inst.uid.toString()))
+			delete objectsByUid[inst.uid.toString()];
 		this.objectcount--;
 		if (type.deadCache.length < 100)
 			type.deadCache.push(inst);
@@ -1986,7 +1994,7 @@
 		var i, len, j, lenj, p, effect_fallback, x, y;
 		if (!initial_inst)
 			return null;
-		var type = this.types_by_index[initial_inst[1]];
+		var type = types_by_index[initial_inst[1]];
 		;
 		;
 		var is_world = type.plugin.is_world;
@@ -2008,11 +2016,11 @@
 			inst = new type.plugin.Instance(type);
 			inst.recycled = false;
 		}
-		if (is_startup_instance && !skip_siblings && !this.objectsByUid.hasOwnProperty(initial_inst[2].toString()))
+		if (is_startup_instance && !skip_siblings && !objectsByUid.hasOwnProperty(initial_inst[2].toString()))
 			inst.uid = initial_inst[2];
 		else
 			inst.uid = this.next_uid++;
-		this.objectsByUid[inst.uid.toString()] = inst;
+		objectsByUid[inst.uid.toString()] = inst;
 		inst.puid = this.next_puid++;
 		inst.iid = type.instances.length;
 		for (i = 0, len = this.createRow.length; i < len; ++i) {
@@ -2993,11 +3001,11 @@
 		var event_stack = this.pushEventStack(trig);
 		event_stack.current_event = trig;
 		if (inst) {
-			var sol = this.types[type_name].getCurrentSol();
+			var sol = types[type_name].getCurrentSol();
 			sol.select_all = false;
 			cr.clearArray(sol.instances);
 			sol.instances[0] = inst;
-			this.types[type_name].applySolToContainer();
+			types[type_name].applySolToContainer();
 		}
 		var ok_to_run = true;
 		if (trig.parent) {
@@ -3107,8 +3115,8 @@
 			}
 			scope = scope.parent;
 		}
-		for (i = 0, leni = this.eventsheets_by_index.length; i < leni; i++) {
-			sheet = this.eventsheets_by_index[i];
+		for (i = 0, leni = eventsheets_by_index.length; i < leni; i++) {
+			sheet = eventsheets_by_index[i];
 			for (j = 0, lenj = sheet.events.length; j < lenj; j++) {
 				e = sheet.events[j];
 				if (e instanceof cr.eventvariable && cr.equals_nocase(name, e.name))
@@ -3119,25 +3127,25 @@
 	};
 	Runtime.prototype.getLayoutBySid = function (sid_) {
 		var i, len;
-		for (i = 0, len = this.layouts_by_index.length; i < len; i++) {
-			if (this.layouts_by_index[i].sid === sid_)
-				return this.layouts_by_index[i];
+		for (i = 0, len = layouts_by_index.length; i < len; i++) {
+			if (layouts_by_index[i].sid === sid_)
+				return layouts_by_index[i];
 		}
 		return null;
 	};
 	Runtime.prototype.getObjectTypeBySid = function (sid_) {
 		var i, len;
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			if (this.types_by_index[i].sid === sid_)
-				return this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			if (types_by_index[i].sid === sid_)
+				return types_by_index[i];
 		}
 		return null;
 	};
 	Runtime.prototype.getGroupBySid = function (sid_) {
 		var i, len;
-		for (i = 0, len = this.allGroups.length; i < len; i++) {
-			if (this.allGroups[i].sid === sid_)
-				return this.allGroups[i];
+		for (i = 0, len = allGroups.length; i < len; i++) {
+			if (allGroups[i].sid === sid_)
+				return allGroups[i];
 		}
 		return null;
 	};
@@ -3372,8 +3380,8 @@
 				"vars": {}
 			}
 		};
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			type = types_by_index[i];
 			if (type.is_family || this.typeHasNoSaveBehavior(type))
 				continue;
 			typeobj = {
@@ -3386,35 +3394,35 @@
 			}
 			o["types"][type.sid.toString()] = typeobj;
 		}
-		for (i = 0, len = this.layouts_by_index.length; i < len; i++) {
-			layout = this.layouts_by_index[i];
+		for (i = 0, len = layouts_by_index.length; i < len; i++) {
+			layout = layouts_by_index[i];
 			o["layouts"][layout.sid.toString()] = layout.saveToJSON();
 		}
 		var ogroups = o["events"]["groups"];
-		for (i = 0, len = this.allGroups.length; i < len; i++) {
-			g = this.allGroups[i];
-			ogroups[g.sid.toString()] = this.groups_by_name[g.group_name].group_active;
+		for (i = 0, len = allGroups.length; i < len; i++) {
+			g = allGroups[i];
+			ogroups[g.sid.toString()] = groups_by_name[g.group_name].group_active;
 		}
 		var ocnds = o["events"]["cnds"];
-		for (p in this.cndsBySid) {
-			if (this.cndsBySid.hasOwnProperty(p)) {
-				c = this.cndsBySid[p];
+		for (p in cndsBySid) {
+			if (cndsBySid.hasOwnProperty(p)) {
+				c = cndsBySid[p];
 				if (cr.hasAnyOwnProperty(c.extra))
 					ocnds[p] = {"ex": CopyExtraObject(c.extra)};
 			}
 		}
 		var oacts = o["events"]["acts"];
-		for (p in this.actsBySid) {
-			if (this.actsBySid.hasOwnProperty(p)) {
-				a = this.actsBySid[p];
+		for (p in actsBySid) {
+			if (actsBySid.hasOwnProperty(p)) {
+				a = actsBySid[p];
 				if (cr.hasAnyOwnProperty(a.extra))
 					oacts[p] = {"ex": CopyExtraObject(a.extra)};
 			}
 		}
 		var ovars = o["events"]["vars"];
-		for (p in this.varsBySid) {
-			if (this.varsBySid.hasOwnProperty(p)) {
-				v = this.varsBySid[p];
+		for (p in varsBySid) {
+			if (varsBySid.hasOwnProperty(p)) {
+				v = varsBySid[p];
 				if (!v.is_constant && (!v.parent || v.is_static))
 					ovars[p] = v.data;
 			}
@@ -3425,14 +3433,14 @@
 	};
 	Runtime.prototype.refreshUidMap = function () {
 		var i, len, type, j, lenj, inst;
-		this.objectsByUid = {};
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			type = this.types_by_index[i];
+		objectsByUid = {};
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			type = types_by_index[i];
 			if (type.is_family)
 				continue;
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {
 				inst = type.instances[j];
-				this.objectsByUid[inst.uid.toString()] = inst;
+				objectsByUid[inst.uid.toString()] = inst;
 			}
 		}
 	};
@@ -3512,36 +3520,36 @@
 		for (p in ogroups) {
 			if (ogroups.hasOwnProperty(p)) {
 				g = this.getGroupBySid(parseInt(p, 10));
-				if (g && this.groups_by_name[g.group_name])
-					this.groups_by_name[g.group_name].setGroupActive(ogroups[p]);
+				if (g && groups_by_name[g.group_name])
+					groups_by_name[g.group_name].setGroupActive(ogroups[p]);
 			}
 		}
 		var ocnds = o["events"]["cnds"];
-		for (p in this.cndsBySid) {
-			if (this.cndsBySid.hasOwnProperty(p)) {
+		for (p in cndsBySid) {
+			if (cndsBySid.hasOwnProperty(p)) {
 				if (ocnds.hasOwnProperty(p)) {
-					this.cndsBySid[p].extra = ocnds[p]["ex"];
+					cndsBySid[p].extra = ocnds[p]["ex"];
 				}
 				else {
-					this.cndsBySid[p].extra = {};
+					cndsBySid[p].extra = {};
 				}
 			}
 		}
 		var oacts = o["events"]["acts"];
-		for (p in this.actsBySid) {
-			if (this.actsBySid.hasOwnProperty(p)) {
+		for (p in actsBySid) {
+			if (actsBySid.hasOwnProperty(p)) {
 				if (oacts.hasOwnProperty(p)) {
-					this.actsBySid[p].extra = oacts[p]["ex"];
+					actsBySid[p].extra = oacts[p]["ex"];
 				}
 				else {
-					this.actsBySid[p].extra = {};
+					actsBySid[p].extra = {};
 				}
 			}
 		}
 		var ovars = o["events"]["vars"];
 		for (p in ovars) {
-			if (ovars.hasOwnProperty(p) && this.varsBySid.hasOwnProperty(p)) {
-				this.varsBySid[p].data = ovars[p];
+			if (ovars.hasOwnProperty(p) && varsBySid.hasOwnProperty(p)) {
+				varsBySid[p].data = ovars[p];
 			}
 		}
 		this.next_uid = rt["next_uid"];
@@ -3552,8 +3560,8 @@
 		}
 		cr.clearArray(this.fireOnCreateAfterLoad);
 		systemObject.loadFromJSON(o["system"]);
-		for (i = 0, len = this.types_by_index.length; i < len; i++) {
-			type = this.types_by_index[i];
+		for (i = 0, len = types_by_index.length; i < len; i++) {
+			type = types_by_index[i];
 			if (type.is_family || this.typeHasNoSaveBehavior(type))
 				continue;
 			for (j = 0, lenj = type.instances.length; j < lenj; j++) {

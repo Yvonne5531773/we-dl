@@ -159,7 +159,7 @@
 	};
 	EventSheet.prototype.init_trigger = function (trig, index) {
 		if (!trig.orblock)
-			this.runtime.triggers_to_postinit.push(trig);	// needs to be postInit'd later
+			triggers_to_postinit.push(trig);	// needs to be postInit'd later
 		var i, len;
 		var cnd = trig.conditions[index];
 		var type_name;
@@ -282,13 +282,13 @@
 			this.initially_activated = !!m[1][0];
 			this.contained_includes = [];
 			this.group_active = this.initially_activated;
-			this.runtime.allGroups.push(this);
-			this.runtime.groups_by_name[this.group_name] = this;
+			allGroups.push(this);
+			groups_by_name[this.group_name] = this;
 		}
 		this.orblock = m[2];
 		this.sid = m[4];
 		if (!this.group)
-			this.runtime.blocksBySid[this.sid.toString()] = this;
+			blocksBySid[this.sid.toString()] = this;
 		var i, len;
 		var cm = m[5];
 		for (i = 0, len = cm.length; i < len; i++) {
@@ -560,7 +560,7 @@
 		this.inverted = m[5];
 		this.isstatic = m[6];
 		this.sid = m[7];
-		this.runtime.cndsBySid[this.sid.toString()] = this;
+		cndsBySid[this.sid.toString()] = this;
 		if (m[0] === -1)		// system object
 		{
 			this.type = null;
@@ -569,7 +569,7 @@
 			this.beh_index = -1;
 		}
 		else {
-			this.type = this.runtime.types_by_index[m[0]];
+			this.type = types_by_index[m[0]];
 			;
 			if (this.isstatic)
 				this.run = this.run_static;
@@ -826,7 +826,7 @@
 			this.beh_index = -1;
 		}
 		else {
-			this.type = this.runtime.types_by_index[m[0]];
+			this.type = types_by_index[m[0]];
 			;
 			this.run = this.run_object;
 			if (m[2]) {
@@ -841,7 +841,7 @@
 			}
 		}
 		this.sid = m[3];
-		this.runtime.actsBySid[this.sid.toString()] = this;
+		actsBySid[this.sid.toString()] = this;
 		if (m.length === 6) {
 			var i, len;
 			var em = m[5];
@@ -980,7 +980,7 @@
 				this.get = this.get_combosel;
 				break;
 			case 6:		// layout
-				this.layout = this.runtime.layouts[m[1]];
+				this.layout = layouts[m[1]];
 				;
 				this.get = this.get_layout;
 				break;
@@ -989,7 +989,7 @@
 				this.get = this.get_key;
 				break;
 			case 4:		// object
-				this.object = this.runtime.types_by_index[m[1]];
+				this.object = types_by_index[m[1]];
 				;
 				this.get = this.get_object;
 				this.block.addSolModifier(this.object);
@@ -1144,20 +1144,18 @@
 		this.is_static = !!m[4];
 		this.is_constant = !!m[5];
 		this.sid = m[6];
-		this.runtime.varsBySid[this.sid.toString()] = this;
+		varsBySid[this.sid.toString()] = this;
 		this.data = this.initial;	// note: also stored in event stack frame for local nonstatic nonconst vars
-		if (this.parent)			// local var
-		{
+		if (this.parent) {
 			if (this.is_static || this.is_constant)
 				this.localIndex = -1;
 			else
 				this.localIndex = this.runtime.stackLocalCount++;
-			this.runtime.all_local_vars.push(this);
+			all_local_vars.push(this);
 		}
-		else						// global var
-		{
+		else {
 			this.localIndex = -1;
-			this.runtime.all_global_vars.push(this);
+			all_global_vars.push(this);
 		}
 	};
 	EventVariable.prototype.postInit = function () {
@@ -1209,9 +1207,7 @@
 		return "include:" + this.include_sheet.toString();
 	};
 	EventInclude.prototype.postInit = function () {
-		this.include_sheet = this.runtime.eventsheets[this.include_sheet_name];
-		;
-		;
+		this.include_sheet = eventsheets[this.include_sheet_name];
 		this.sheet.includes.add(this);
 		this.solModifiers = findMatchingSolModifier(this.solModifiers);
 		var p = this.parent;
@@ -1224,11 +1220,11 @@
 	};
 	EventInclude.prototype.run = function () {
 		if (this.parent)
-			this.runtime.pushCleanSol(this.runtime.types_by_index);
+			this.runtime.pushCleanSol(types_by_index);
 		if (!this.include_sheet.hasRun)
 			this.include_sheet.run(true);			// from include
 		if (this.parent)
-			this.runtime.popSol(this.runtime.types_by_index);
+			this.runtime.popSol(types_by_index);
 	};
 	EventInclude.prototype.updateActive = function () {
 		var p = this.parent;

@@ -74,7 +74,7 @@
 					this.results.length = 1;      // to fit 'ret'
 				break;
 			case 20:	// object_exp
-				this.object_type = this.runtime.types_by_index[m[1]];
+				this.object_type = types_by_index[m[1]];
 				;
 				this.beh_index = -1;
 				this.func = this.runtime.GetObjectReference(m[2]);
@@ -96,7 +96,7 @@
 					this.results.length = 1;	// to fit 'ret'
 				break;
 			case 21:		// instvar_exp
-				this.object_type = this.runtime.types_by_index[m[1]];
+				this.object_type = types_by_index[m[1]];
 				;
 				this.return_string = m[2];
 				if (m[3])
@@ -106,7 +106,7 @@
 				this.varindex = m[4];
 				break;
 			case 22:		// behavior_exp
-				this.object_type = this.runtime.types_by_index[m[1]];
+				this.object_type = types_by_index[m[1]];
 				;
 				this.behavior_type = this.object_type.getBehaviorByName(m[2]);
 				;

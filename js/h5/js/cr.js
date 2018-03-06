@@ -1474,8 +1474,7 @@ cr.behaviors = {};
 				waitobj["sm"].push(w.solModifiers[j].sid);
 			for (p in w.sols) {
 				if (w.sols.hasOwnProperty(p)) {
-					t = this.runtime.types_by_index[parseInt(p, 10)];
-					;
+					t = types_by_index[parseInt(p, 10)];
 					sobj = {
 						"sa": w.sols[p].sa,
 						"insts": []
@@ -1495,7 +1494,7 @@ cr.behaviors = {};
 		cr.clearArray(this.waits);
 		for (i = 0, len = owaits.length; i < len; i++) {
 			w = owaits[i];
-			e = this.runtime.blocksBySid[w["ev"].toString()];
+			e = blocksBySid[w["ev"].toString()];
 			if (!e)
 				continue;	// event must've gone missing
 			aindex = -1;

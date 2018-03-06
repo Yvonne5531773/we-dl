@@ -10,7 +10,7 @@
 	"compileType": "game",
 	"libVersion": "game",
 	"appid": "touristappid",
-	"projectname": "wechat-dancing-line",
+	"projectname": "danceline",
 	"isGameTourist": true,
 	"condition": {
 		"search": {

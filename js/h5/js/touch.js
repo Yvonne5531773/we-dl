@@ -291,43 +291,33 @@
 				}, false);
 			}
 		} else {
-			// console.log('touch elem', elem)
-			// console.log('touch window', window)
-			// elem.addEventListener("touchstart",
-			// 	function (info) {
-			// 		console.log('elem.addEventListener("touchstart"')
-			// 		// self.onTouchStart(info);
-			// 	},
-			// 	false
-			// )
-			// wx.onTouchStart(function(info) {
-			// 	console.log('click info', info)
-			// })
-			// window.addEventListener("touchstart",
-			// 	function (info) {
-			// 		console.log('elem.addEventListener("touchstart"')
-			// 		self.onTouchStart(info);
-			// 	},
-			// 	false
-			// );
-			// elem.addEventListener("touchmove",
-			// 	function (info) {
-			// 		self.onTouchMove(info);
-			// 	},
-			// 	false
-			// );
-			// elem2.addEventListener("touchend",
-			// 	function (info) {
-			// 		self.onTouchEnd(info, false);
-			// 	},
-			// 	false
-			// );
-			// elem2.addEventListener("touchcancel",
-			// 	function (info) {
-			// 		self.onTouchEnd(info, true);
-			// 	},
-			// 	false
-			// );
+			console.log('touch elem', elem)
+			console.log('touch window', window)
+			elem.addEventListener("touchstart",
+				function (info) {
+					console.log('elem.addEventListener("touchstart"')
+					self.onTouchStart(info);
+				},
+				false
+			)
+			elem.addEventListener("touchmove",
+				function (info) {
+					self.onTouchMove(info);
+				},
+				false
+			);
+			elem2.addEventListener("touchend",
+				function (info) {
+					self.onTouchEnd(info, false);
+				},
+				false
+			);
+			elem2.addEventListener("touchcancel",
+				function (info) {
+					self.onTouchEnd(info, true);
+				},
+				false
+			);
 		}
 		if (this.isWindows8) {
 			// var win8accelerometerFn = function (e) {
@@ -510,7 +500,7 @@
 	instanceProto.onTouchStart = function (info) {
 		if (info.preventDefault && cr.isCanvasInputEvent(info))
 			info.preventDefault();
-		var offset = this.runtime.isDomFree ? dummyoffset : offsetFun(this.runtime.canvas)
+		var offset = this.runtime.isDomFree ? dummyoffset : offsetFun(canvas)
 		var nowtime = cr.performance_now();
 		this.runtime.isInUserInputEvent = true;
 		var i, len, t, j;
