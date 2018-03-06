@@ -5,8 +5,10 @@
 		window["msRequestAnimationFrame"] ||
 		window["oRequestAnimationFrame"];
 
+	var systemObject = {}
+	var behaviors = []
 	function Runtime(canvas) {
-		console.log('runtime canvas', canvas)
+		// console.log('runtime canvas', canvas)
 		if (!canvas || (!canvas.getContext && !canvas["dc"]))
 			return;
 		if (canvas["c2runtime"])
@@ -23,9 +25,11 @@
 		this.isEjecta = !!window["c2ejecta"];
 		if (this.isCocoonJs) {
 			CocoonJS["App"]["onSuspended"].addEventListener(function () {
+				console.log('onSuspended')
 				self["setSuspended"](true);
 			});
 			CocoonJS["App"]["onActivated"].addEventListener(function () {
+				console.log('onActivated')
 				self["setSuspended"](false);
 			});
 		}
@@ -72,7 +76,7 @@
 		}
 		this.isWKWebView = !!(this.isiOS && this.isCordova && window["webkit"]);
 		this.httpServer = null;
-		this.httpServerUrl = "";
+		this.httpServerUrl = ""
 		if (this.isWKWebView) {
 			this.httpServer = (cordova && cordova["plugins"] && cordova["plugins"]["CorHttpd"]) ? cordova["plugins"]["CorHttpd"] : null;
 		}
@@ -80,7 +84,6 @@
 			this.isNWjs = true;
 		}
 		this.isDebug = (typeof cr_is_preview !== "undefined" && window.location.search.indexOf("debug") > -1);
-		this.canvas = canvas;
 		this.canvasdiv = document.getElementById("c2canvasdiv");
 		this.gl = null;
 		this.glwrap = null;
@@ -92,11 +95,11 @@
 		this.firstInFullscreen = false;
 		this.oldWidth = 0;		// for restoring non-fullscreen canvas after fullscreen
 		this.oldHeight = 0;
-		this.canvas.oncontextmenu = function (e) {
+		canvas.oncontextmenu = function (e) {
 			if (e.preventDefault) e.preventDefault();
 			return false;
 		};
-		this.canvas.onselectstart = function (e) {
+		canvas.onselectstart = function (e) {
 			if (e.preventDefault) e.preventDefault();
 			return false;
 		};
@@ -133,10 +136,10 @@
 				return +new Date();
 			};
 		}
-		this.plugins = [];
+		// this.plugins = [];
 		this.types = {};
 		this.types_by_index = [];
-		this.behaviors = [];
+		// this.behaviors = [];
 		this.layouts = {};
 		this.layouts_by_index = [];
 		this.eventsheets = {};
@@ -325,6 +328,7 @@
 		xhr.send();
 	}
 	Runtime.prototype.initRendererAndLoader = function () {
+		console.log('Runtime.prototype.initRendererAndLoader')
 		var self = this;
 		var i, len, j, lenj, k, lenk, t, s, l, y;
 		this.isRetina = ((!this.isDomFree || this.isEjecta || this.isCordova) && this.useHighDpi && !this.isAndroidStockBrowser);
@@ -335,13 +339,15 @@
 		var attribs;
 		if (this.fullscreen_mode > 0)
 			this["setSize"](window.innerWidth, window.innerHeight, true);
-		this.canvas.addEventListener("webglcontextlost", function (ev) {
+		canvas.addEventListener("webglcontextlost", function (ev) {
+			console.log('webglcontextlost')
 			ev.preventDefault();
 			self.onContextLost();
 			cr.logexport("[Construct 2] WebGL context lost");
 			window["cr_setSuspended"](true);		// stop rendering
 		}, false);
-		this.canvas.addEventListener("webglcontextrestored", function (ev) {
+		canvas.addEventListener("webglcontextrestored", function (ev) {
+			console.log('webglcontextrestored')
 			self.glwrap.initState();
 			self.glwrap.setSize(self.glwrap.width, self.glwrap.height, true);
 			self.layer_tex = null;
@@ -362,9 +368,9 @@
 					"powerPreference": "high-performance",
 					"failIfMajorPerformanceCaveat": true
 				};
-				this.gl = (this.canvas.getContext("webgl2", attribs) ||
-					this.canvas.getContext("webgl", attribs) ||
-					this.canvas.getContext("experimental-webgl", attribs));
+				this.gl = (canvas.getContext("webgl2", attribs) ||
+					canvas.getContext("webgl", attribs) ||
+					canvas.getContext("experimental-webgl", attribs));
 			}
 		}
 		catch (e) {
@@ -382,8 +388,8 @@
 			;
 			if (!this.isDomFree) {
 				this.overlay_canvas = document.createElement("canvas");
-				this.canvas.parentNode.appendChild(this.overlay_canvas)
-				// $(this.overlay_canvas).appendTo(this.canvas.parentNode);
+				canvas.parentNode.appendChild(this.overlay_canvas)
+				// $(this.overlay_canvas).appendTo(canvas.parentNode);
 				this.overlay_canvas.oncontextmenu = function (e) {
 					return false;
 				};
@@ -401,7 +407,7 @@
 			}
 			console.log('cr.GLWrap', cr.GLWrap)
 			this.glwrap = new cr.GLWrap(this.gl, this.isMobile, this.enableFrontToBack);
-			this.glwrap.setSize(this.canvas.width, this.canvas.height);
+			this.glwrap.setSize(canvas.width, canvas.height);
 			this.glwrap.enable_mipmaps = (this.downscalingQuality !== 0);
 			this.ctx = null;
 			for (i = 0, len = this.types_by_index.length; i < len; i++) {
@@ -436,7 +442,7 @@
 		else {
 			if (this.fullscreen_mode > 0 && this.isDirectCanvas) {
 				;
-				this.canvas = null;
+				canvas = null;
 				document.oncontextmenu = function (e) {
 					return false;
 				};
@@ -463,13 +469,13 @@
 						"antialias": !!this.linearSampling,
 						"alpha": true
 					};
-					this.ctx = this.canvas.getContext("2d", attribs);
+					this.ctx = canvas.getContext("2d", attribs);
 				}
 				else {
 					attribs = {
 						"alpha": true
 					};
-					this.ctx = this.canvas.getContext("2d", attribs);
+					this.ctx = canvas.getContext("2d", attribs);
 				}
 				this.setCtxImageSmoothingEnabled(this.ctx, this.linearSampling);
 			}
@@ -481,9 +487,11 @@
 		};
 		if (window != window.top && !this.isDomFree && !this.isWinJS && !this.isWindowsPhone8) {
 			document.addEventListener("mousedown", function () {
+				console.log('mousedown')
 				window.focus();
 			}, true);
 			document.addEventListener("touchstart", function () {
+				console.log('touchstart')
 				window.focus();
 			}, true);
 		}
@@ -497,6 +505,7 @@
 			}
 			if (this.pauseOnBlur && !this.isMobile) {
 				window.addEventListener("focus", function () {
+					console.log('focus')
 					self["setSuspended"](false);
 				});
 				window.addEventListener("blur", function () {
@@ -531,16 +540,16 @@
 				// 	}
 				// }
 			}
-			if (typeof PointerEvent !== "undefined") {
-				document.addEventListener("pointerdown", unfocusFormControlFunc);
-			}
-			else if (window.navigator["msPointerEnabled"]) {
-				document.addEventListener("MSPointerDown", unfocusFormControlFunc);
-			}
-			else {
-				document.addEventListener("touchstart", unfocusFormControlFunc);
-			}
-			document.addEventListener("mousedown", unfocusFormControlFunc);
+			// if (typeof PointerEvent !== "undefined") {
+			// 	document.addEventListener("pointerdown", unfocusFormControlFunc);
+			// }
+			// else if (window.navigator["msPointerEnabled"]) {
+			// 	document.addEventListener("MSPointerDown", unfocusFormControlFunc);
+			// }
+			// else {
+			// 	document.addEventListener("touchstart", unfocusFormControlFunc);
+			// }
+			// document.addEventListener("mousedown", unfocusFormControlFunc);
 		}
 		if (this.fullscreen_mode === 0 && this.isRetina && this.devicePixelRatio > 1) {
 			this["setSize"](this.original_width, this.original_height, true);
@@ -669,7 +678,7 @@
 			this.canvasdiv.style.height = Math.round(h) + "px"
 			this.canvasdiv.style.marginLeft = Math.floor(offx) + "px"
 			this.canvasdiv.style.marginTop = Math.floor(offy) + "px"
-			// $(this.canvasdiv).css({"width": Math.round(w) + "px",
+			// $(canvasdiv).css({"width": Math.round(w) + "px",
 			// 	"height": Math.round(h) + "px",
 			// 	"margin-left": Math.floor(offx) + "px",
 			// 	"margin-top": Math.floor(offy) + "px"});
@@ -680,18 +689,18 @@
 				// 	"height": Math.round(h) + "px"});
 			}
 		}
-		if (this.canvas) {
-			this.canvas.width = Math.round(w * dpr);
-			this.canvas.height = Math.round(h * dpr);
+		if (canvas) {
+			canvas.width = Math.round(w * dpr);
+			canvas.height = Math.round(h * dpr);
 			if (this.isEjecta) {
-				this.canvas.style.left = Math.floor(offx) + "px";
-				this.canvas.style.top = Math.floor(offy) + "px";
-				this.canvas.style.width = Math.round(w) + "px";
-				this.canvas.style.height = Math.round(h) + "px";
+				canvas.style.left = Math.floor(offx) + "px";
+				canvas.style.top = Math.floor(offy) + "px";
+				canvas.style.width = Math.round(w) + "px";
+				canvas.style.height = Math.round(h) + "px";
 			}
 			else if (this.isRetina && !this.isDomFree) {
-				this.canvas.style.width = Math.round(w) + "px";
-				this.canvas.style.height = Math.round(h) + "px";
+				canvas.style.width = Math.round(w) + "px";
+				canvas.style.height = Math.round(h) + "px";
 			}
 		}
 		if (this.overlay_canvas) {
@@ -763,7 +772,7 @@
 		if (this.isDomFree)
 			return;
 		var isfullscreen = (document["mozFullScreen"] || document["webkitIsFullScreen"] || document["fullScreen"] || !!document["msFullscreenElement"] || this.isNodeFullscreen) && !this.isCordova;
-		var overlay_position = isfullscreen ? offsetFun(this.canvas) : this.canvas.style.position;
+		var overlay_position = isfullscreen ? offsetFun(canvas) : canvas.style.position;
 		overlay_position.position = "absolute";
 		this.overlay_canvas.style.overlayPosition = ''
 		// $(this.overlay_canvas).css(overlay_position);
@@ -866,9 +875,12 @@
 		}
 		this.next_uid = pm[21];
 		this.objectRefTable = cr.getObjectRefTable();
-		this.system = new cr.system_object(this);
+		systemObject = new cr.system_object(this);
+		this.waits = systemObject.waits
+		console.log('systemObject', systemObject)
 		var i, len, j, lenj, k, lenk, idstr, m, b, t, f, p;
 		var plugin, plugin_ctor;
+		var plugins = [];
 		for (i = 0, len = pm[2].length; i < len; i++) {
 			m = pm[2][i];
 			p = this.GetObjectReference(m[0]);
@@ -881,17 +893,17 @@
 			if (plugin.onCreate)
 				plugin.onCreate();
 			cr.seal(plugin);
-			this.plugins.push(plugin);
+			plugins.push(plugin);
+			// this.plugins.push(plugin);
 		}
 		this.objectRefTable = cr.getObjectRefTable();
 		for (i = 0, len = pm[3].length; i < len; i++) {
 			m = pm[3][i];
 			plugin_ctor = this.GetObjectReference(m[1]);
-			;
 			plugin = null;
-			for (j = 0, lenj = this.plugins.length; j < lenj; j++) {
-				if (this.plugins[j] instanceof plugin_ctor) {
-					plugin = this.plugins[j];
+			for (j = 0, lenj = plugins.length; j < lenj; j++) {
+				if (plugins[j] instanceof plugin_ctor) {
+					plugin = plugins[j];
 					break;
 				}
 			}
@@ -964,9 +976,9 @@
 				b = m[8][j];
 				var behavior_ctor = this.GetObjectReference(b[1]);
 				var behavior_plugin = null;
-				for (k = 0, lenk = this.behaviors.length; k < lenk; k++) {
-					if (this.behaviors[k] instanceof behavior_ctor) {
-						behavior_plugin = this.behaviors[k];
+				for (k = 0, lenk = behaviors.length; k < lenk; k++) {
+					if (behaviors[k] instanceof behavior_ctor) {
+						behavior_plugin = behaviors[k];
 						break;
 					}
 				}
@@ -977,7 +989,7 @@
 					if (behavior_plugin.onCreate)
 						behavior_plugin.onCreate();
 					cr.seal(behavior_plugin);
-					this.behaviors.push(behavior_plugin);
+					behaviors.push(behavior_plugin);
 					if (cr.behaviors.solid && behavior_plugin instanceof cr.behaviors.solid)
 						this.solidBehavior = behavior_plugin;
 					if (cr.behaviors.jumpthru && behavior_plugin instanceof cr.behaviors.jumpthru)
@@ -997,129 +1009,130 @@
 			type_inst.global = m[9];
 			type_inst.isOnLoaderLayout = m[10];
 			type_inst.effect_types = [];
-			for (j = 0, lenj = m[12].length; j < lenj; j++) {
-				type_inst.effect_types.push({
-					id: m[12][j][0],
-					name: m[12][j][1],
-					shaderindex: -1,
-					preservesOpaqueness: false,
-					active: true,
-					index: j
-				});
-			}
-			type_inst.tile_poly_data = m[13];
-			if (!this.uses_loader_layout || type_inst.is_family || type_inst.isOnLoaderLayout || !plugin.is_world) {
-				type_inst.onCreate();
-				cr.seal(type_inst);
-			}
-			if (type_inst.name)
-				this.types[type_inst.name] = type_inst;
-			this.types_by_index.push(type_inst);
-			if (plugin.singleglobal) {
-				var instance = new plugin.Instance(type_inst);
-				instance.uid = this.next_uid++;
-				instance.puid = this.next_puid++;
-				instance.iid = 0;
-				instance.get_iid = cr.inst_get_iid;
-				instance.toString = cr.inst_toString;
-				instance.properties = m[14];
-				instance.onCreate();
-				cr.seal(instance);
-				type_inst.instances.push(instance);
-				this.objectsByUid[instance.uid.toString()] = instance;
-			}
+			// for (j = 0, lenj = m[12].length; j < lenj; j++) {
+			// 	type_inst.effect_types.push({
+			// 		id: m[12][j][0],
+			// 		name: m[12][j][1],
+			// 		shaderindex: -1,
+			// 		preservesOpaqueness: false,
+			// 		active: true,
+			// 		index: j
+			// 	});
+			// }
+			// type_inst.tile_poly_data = m[13];
+			// if (!this.uses_loader_layout || type_inst.is_family || type_inst.isOnLoaderLayout || !plugin.is_world) {
+			// 	type_inst.onCreate();
+			// 	cr.seal(type_inst);
+			// }
+			// if (type_inst.name)
+			// 	this.types[type_inst.name] = type_inst;
+			// this.types_by_index.push(type_inst);
+			// if (plugin.singleglobal) {
+			// 	var instance = new plugin.Instance(type_inst);
+			// 	instance.uid = this.next_uid++;
+			// 	instance.puid = this.next_puid++;
+			// 	instance.iid = 0;
+			// 	instance.get_iid = cr.inst_get_iid;
+			// 	instance.toString = cr.inst_toString;
+			// 	instance.properties = m[14];
+			// 	instance.onCreate();
+			// 	cr.seal(instance);
+			// 	type_inst.instances.push(instance);
+			// 	this.objectsByUid[instance.uid.toString()] = instance;
+			// }
 		}
-		for (i = 0, len = pm[4].length; i < len; i++) {
-			var familydata = pm[4][i];
-			var familytype = this.types_by_index[familydata[0]];
-			var familymember;
-			for (j = 1, lenj = familydata.length; j < lenj; j++) {
-				familymember = this.types_by_index[familydata[j]];
-				familymember.families.push(familytype);
-				familytype.members.push(familymember);
-			}
-		}
-		for (i = 0, len = pm[28].length; i < len; i++) {
-			var containerdata = pm[28][i];
-			var containertypes = [];
-			for (j = 0, lenj = containerdata.length; j < lenj; j++)
-				containertypes.push(this.types_by_index[containerdata[j]]);
-			for (j = 0, lenj = containertypes.length; j < lenj; j++) {
-				containertypes[j].is_contained = true;
-				containertypes[j].container = containertypes;
-			}
-		}
-		if (this.family_count > 0) {
-			for (i = 0, len = this.types_by_index.length; i < len; i++) {
-				t = this.types_by_index[i];
-				if (t.is_family || !t.families.length)
-					continue;
-				t.family_var_map = new Array(this.family_count);
-				t.family_beh_map = new Array(this.family_count);
-				t.family_fx_map = new Array(this.family_count);
-				var all_fx = [];
-				var varsum = 0;
-				var behsum = 0;
-				var fxsum = 0;
-				for (j = 0, lenj = t.families.length; j < lenj; j++) {
-					f = t.families[j];
-					t.family_var_map[f.family_index] = varsum;
-					varsum += f.vars_count;
-					t.family_beh_map[f.family_index] = behsum;
-					behsum += f.behs_count;
-					t.family_fx_map[f.family_index] = fxsum;
-					fxsum += f.fx_count;
-					for (k = 0, lenk = f.effect_types.length; k < lenk; k++)
-						all_fx.push(cr.shallowCopy({}, f.effect_types[k]));
-				}
-				t.effect_types = all_fx.concat(t.effect_types);
-				for (j = 0, lenj = t.effect_types.length; j < lenj; j++)
-					t.effect_types[j].index = j;
-			}
-		}
-		for (i = 0, len = pm[5].length; i < len; i++) {
-			m = pm[5][i];
-			var layout = new cr.layout(this, m);
-			cr.seal(layout);
-			this.layouts[layout.name] = layout;
-			this.layouts_by_index.push(layout);
-		}
-		for (i = 0, len = pm[6].length; i < len; i++) {
-			m = pm[6][i];
-			var sheet = new cr.eventsheet(this, m);
-			cr.seal(sheet);
-			this.eventsheets[sheet.name] = sheet;
-			this.eventsheets_by_index.push(sheet);
-		}
-		for (i = 0, len = this.eventsheets_by_index.length; i < len; i++)
-			this.eventsheets_by_index[i].postInit();
-		for (i = 0, len = this.eventsheets_by_index.length; i < len; i++)
-			this.eventsheets_by_index[i].updateDeepIncludes();
-		for (i = 0, len = this.triggers_to_postinit.length; i < len; i++)
-			this.triggers_to_postinit[i].postInit();
-		cr.clearArray(this.triggers_to_postinit)
-		this.audio_to_preload = pm[7];
-		this.files_subfolder = pm[8];
-		this.pixel_rounding = pm[9];
-		this.aspect_scale = 1.0;
-		this.enableWebGL = pm[13];
-		this.linearSampling = pm[14];
-		this.clearBackground = pm[15];
-		this.versionstr = pm[16];
-		this.useHighDpi = pm[17];
-		this.orientations = pm[20];		// 0 = any, 1 = portrait, 2 = landscape
-		this.autoLockOrientation = (this.orientations > 0);
-		this.pauseOnBlur = pm[22];
-		this.wantFullscreenScalingQuality = pm[23];		// false = low quality, true = high quality
-		this.fullscreenScalingQuality = this.wantFullscreenScalingQuality;
-		this.downscalingQuality = pm[24];	// 0 = low (mips off), 1 = medium (mips on, dense spritesheet), 2 = high (mips on, sparse spritesheet)
-		this.preloadSounds = pm[25];		// 0 = no, 1 = yes
-		this.projectName = pm[26];
-		this.enableFrontToBack = pm[27] && !this.isIE;		// front-to-back renderer disabled in IE (but not Edge)
-		this.start_time = Date.now();
-		cr.clearArray(this.objectRefTable);
-		this.initRendererAndLoader();
+		// for (i = 0, len = pm[4].length; i < len; i++) {
+		// 	var familydata = pm[4][i];
+		// 	var familytype = this.types_by_index[familydata[0]];
+		// 	var familymember;
+		// 	for (j = 1, lenj = familydata.length; j < lenj; j++) {
+		// 		familymember = this.types_by_index[familydata[j]];
+		// 		familymember.families.push(familytype);
+		// 		familytype.members.push(familymember);
+		// 	}
+		// }
+		// for (i = 0, len = pm[28].length; i < len; i++) {
+		// 	var containerdata = pm[28][i];
+		// 	var containertypes = [];
+		// 	for (j = 0, lenj = containerdata.length; j < lenj; j++)
+		// 		containertypes.push(this.types_by_index[containerdata[j]]);
+		// 	for (j = 0, lenj = containertypes.length; j < lenj; j++) {
+		// 		containertypes[j].is_contained = true;
+		// 		containertypes[j].container = containertypes;
+		// 	}
+		// }
+		// if (this.family_count > 0) {
+		// 	for (i = 0, len = this.types_by_index.length; i < len; i++) {
+		// 		t = this.types_by_index[i];
+		// 		if (t.is_family || !t.families.length)
+		// 			continue;
+		// 		t.family_var_map = new Array(this.family_count);
+		// 		t.family_beh_map = new Array(this.family_count);
+		// 		t.family_fx_map = new Array(this.family_count);
+		// 		var all_fx = [];
+		// 		var varsum = 0;
+		// 		var behsum = 0;
+		// 		var fxsum = 0;
+		// 		for (j = 0, lenj = t.families.length; j < lenj; j++) {
+		// 			f = t.families[j];
+		// 			t.family_var_map[f.family_index] = varsum;
+		// 			varsum += f.vars_count;
+		// 			t.family_beh_map[f.family_index] = behsum;
+		// 			behsum += f.behs_count;
+		// 			t.family_fx_map[f.family_index] = fxsum;
+		// 			fxsum += f.fx_count;
+		// 			for (k = 0, lenk = f.effect_types.length; k < lenk; k++)
+		// 				all_fx.push(cr.shallowCopy({}, f.effect_types[k]));
+		// 		}
+		// 		t.effect_types = all_fx.concat(t.effect_types);
+		// 		for (j = 0, lenj = t.effect_types.length; j < lenj; j++)
+		// 			t.effect_types[j].index = j;
+		// 	}
+		// }
+		// for (i = 0, len = pm[5].length; i < len; i++) {
+		// 	m = pm[5][i];
+		// 	var layout = new cr.layout(this, m);
+		// 	cr.seal(layout);
+		// 	this.layouts[layout.name] = layout;
+		// 	this.layouts_by_index.push(layout);
+		// }
+		// for (i = 0, len = pm[6].length; i < len; i++) {
+		// 	m = pm[6][i];
+		// 	var sheet = new cr.eventsheet(this, m);
+		// 	cr.seal(sheet);
+		// 	this.eventsheets[sheet.name] = sheet;
+		// 	this.eventsheets_by_index.push(sheet);
+		// }
+		// for (i = 0, len = this.eventsheets_by_index.length; i < len; i++)
+		// 	this.eventsheets_by_index[i].postInit();
+		// for (i = 0, len = this.eventsheets_by_index.length; i < len; i++)
+		// 	this.eventsheets_by_index[i].updateDeepIncludes();
+		// for (i = 0, len = this.triggers_to_postinit.length; i < len; i++)
+		// 	this.triggers_to_postinit[i].postInit();
+		// cr.clearArray(this.triggers_to_postinit)
+		// this.audio_to_preload = pm[7];
+		// this.files_subfolder = pm[8];
+		// this.pixel_rounding = pm[9];
+		// this.aspect_scale = 1.0;
+		// this.enableWebGL = pm[13];
+		// this.linearSampling = pm[14];
+		// this.clearBackground = pm[15];
+		// this.versionstr = pm[16];
+		// this.useHighDpi = pm[17];
+		// this.orientations = pm[20];		// 0 = any, 1 = portrait, 2 = landscape
+		// this.autoLockOrientation = (this.orientations > 0);
+		// this.pauseOnBlur = pm[22];
+		// this.wantFullscreenScalingQuality = pm[23];		// false = low quality, true = high quality
+		// this.fullscreenScalingQuality = this.wantFullscreenScalingQuality;
+		// this.downscalingQuality = pm[24];	// 0 = low (mips off), 1 = medium (mips on, dense spritesheet), 2 = high (mips on, sparse spritesheet)
+		// this.preloadSounds = pm[25];		// 0 = no, 1 = yes
+		// this.projectName = pm[26];
+		// this.enableFrontToBack = pm[27] && !this.isIE;		// front-to-back renderer disabled in IE (but not Edge)
+		// this.start_time = Date.now();
+		// cr.clearArray(this.objectRefTable);
+		// this.initRendererAndLoader();
 	}
+
 	var anyImageHadError = false;
 	Runtime.prototype.waitForImageLoad = function (img_, src_) {
 		img_["cocoonLazyLoad"] = true;
@@ -1408,7 +1421,7 @@
 	};
 	Runtime.prototype.go_loading_finished = function () {
 		if (this.overlay_canvas) {
-			this.canvas.parentNode.removeChild(this.overlay_canvas);
+			canvas.parentNode.removeChild(this.overlay_canvas);
 			this.overlay_ctx = null;
 			this.overlay_canvas = null;
 		}
@@ -1494,20 +1507,20 @@
 		if (!this.isDomFree) {
 			if (isfullscreen) {
 				if (!this.firstInFullscreen) {
-					this.fullscreenOldMarginCss = this.canvas.style.margin || "0";
+					this.fullscreenOldMarginCss = canvas.style.margin || "0";
 					this.firstInFullscreen = true;
 				}
 				if (!this.isChrome && !this.isNWjs) {
-					console.log('this.canvas1', this.canvas)
-					this.canvas.style.marginLeft = "" + Math.floor((screen.width - (this.width / this.devicePixelRatio)) / 2) + "px"
-					this.canvas.style.marginTop = "" + Math.floor((screen.height - (this.height / this.devicePixelRatio)) / 2) + "px"
+					// console.log('canvas1', canvas)
+					canvas.style.marginLeft = "" + Math.floor((screen.width - (this.width / this.devicePixelRatio)) / 2) + "px"
+					canvas.style.marginTop = "" + Math.floor((screen.height - (this.height / this.devicePixelRatio)) / 2) + "px"
 				}
 			}
 			else {
 				if (this.firstInFullscreen) {
 					if (!this.isChrome && !this.isNWjs) {
-						this.canvas.style.margin = this.fullscreenOldMarginCss
-						// $(this.canvas).css("margin", this.fullscreenOldMarginCss);
+						canvas.style.margin = this.fullscreenOldMarginCss
+						// $(canvas).css("margin", this.fullscreenOldMarginCss);
 					}
 					this.fullscreenOldMarginCss = "";
 					this.firstInFullscreen = false;
@@ -1540,8 +1553,8 @@
 			else
 				this.draw();
 			if (this.snapshotCanvas) {
-				if (this.canvas && this.canvas.toDataURL) {
-					this.snapshotData = this.canvas.toDataURL(this.snapshotCanvas[0], this.snapshotCanvas[1]);
+				if (canvas && canvas.toDataURL) {
+					this.snapshotData = canvas.toDataURL(this.snapshotCanvas[0], this.snapshotCanvas[1]);
 					if (window["cr_onSnapshot"])
 						window["cr_onSnapshot"](this.snapshotData);
 					this.trigger(cr.system_object.prototype.cnds.OnCanvasSnapshot, null);
@@ -1608,7 +1621,7 @@
 			this.aspect_scale = (this.isRetina ? this.devicePixelRatio : 1);
 		this.ClearDeathRow();
 		this.isInOnDestroy++;
-		this.system.runWaits();		// prevent instance list changing
+		systemObject.runWaits();		// prevent instance list changing
 		this.isInOnDestroy--;
 		this.ClearDeathRow();		// allow instance list changing
 		this.isInOnDestroy++;
@@ -1708,7 +1721,7 @@
 			}
 		}
 		if (prev_layout == changeToLayout)
-			cr.clearArray(this.system.waits);
+			cr.clearArray(systemObject.waits);
 		cr.clearArray(this.registered_collisions);
 		this.runLayoutChangeMethods(true);
 		changeToLayout.startRunning();
@@ -1719,8 +1732,8 @@
 	};
 	Runtime.prototype.runLayoutChangeMethods = function (isBeforeChange) {
 		var i, len, beh, type, j, lenj, inst, k, lenk, binst;
-		for (i = 0, len = this.behaviors.length; i < len; i++) {
-			beh = this.behaviors[i];
+		for (i = 0, len = behaviors.length; i < len; i++) {
+			beh = behaviors[i];
 			if (isBeforeChange) {
 				if (beh.onBeforeLayoutChange)
 					beh.onBeforeLayoutChange();
@@ -1893,8 +1906,8 @@
 			cr.arrayRemoveAllFromObjectSet(f.instances, obj_set);
 			f.stale_iids = true;
 		}
-		for (i = 0, len = this.system.waits.length; i < len; ++i) {
-			w = this.system.waits[i];
+		for (i = 0, len = systemObject.waits.length; i < len; ++i) {
+			w = systemObject.waits[i];
 			if (w.sols.hasOwnProperty(type.index))
 				cr.arrayRemoveAllFromObjectSet(w.sols[type.index].insts, obj_set);
 			if (!type.is_family) {
@@ -2893,13 +2906,13 @@
 		return cr.angleTo(0, 0, rx, ry);
 	};
 	var triggerSheetIndex = -1;
-	Runtime.prototype.trigger = function (method, inst, value /* for fast triggers */) {
+	Runtime.prototype.trigger = function (method, inst, value) {
 		// console.log('Runtime.prototype.trigger')
 		if (!this.running_layout)
 			return false;
 		var sheet = this.running_layout.event_sheet;
 		if (!sheet)
-			return false;     // no event sheet active; nothing to trigger
+			return false;
 		var ret = false;
 		var r, i, len;
 		triggerSheetIndex++;
@@ -3406,7 +3419,7 @@
 					ovars[p] = v.data;
 			}
 		}
-		o["system"] = this.system.saveToJSON();
+		o["system"] = systemObject.saveToJSON();
 		console.log('in runtime.js o', o)
 		return JSON.stringify(o);
 	};
@@ -3538,7 +3551,7 @@
 			this.trigger(Object.getPrototypeOf(inst.type.plugin).cnds.OnCreated, inst);
 		}
 		cr.clearArray(this.fireOnCreateAfterLoad);
-		this.system.loadFromJSON(o["system"]);
+		systemObject.loadFromJSON(o["system"]);
 		for (i = 0, len = this.types_by_index.length; i < len; i++) {
 			type = this.types_by_index[i];
 			if (type.is_family || this.typeHasNoSaveBehavior(type))

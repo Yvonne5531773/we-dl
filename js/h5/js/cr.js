@@ -1448,20 +1448,17 @@ cr.behaviors = {};
 			return true;
 		return false;
 	};
-	cr.system_object = function (runtime)
-	{
+	cr.system_object = function (runtime) {
 		this.runtime = runtime;
 		this.waits = [];
 	};
-	cr.system_object.prototype.saveToJSON = function ()
-	{
+	cr.system_object.prototype.saveToJSON = function () {
 		var o = {};
 		var i, len, j, lenj, p, w, t, sobj;
 		o["waits"] = [];
 		var owaits = o["waits"];
 		var waitobj;
-		for (i = 0, len = this.waits.length; i < len; i++)
-		{
+		for (i = 0, len = this.waits.length; i < len; i++) {
 			w = this.waits[i];
 			waitobj = {
 				"t": w.time,
@@ -1475,10 +1472,8 @@ cr.behaviors = {};
 				waitobj["act"] = w.ev.actions[w.actindex].sid;
 			for (j = 0, lenj = w.solModifiers.length; j < lenj; j++)
 				waitobj["sm"].push(w.solModifiers[j].sid);
-			for (p in w.sols)
-			{
-				if (w.sols.hasOwnProperty(p))
-				{
+			for (p in w.sols) {
+				if (w.sols.hasOwnProperty(p)) {
 					t = this.runtime.types_by_index[parseInt(p, 10)];
 					;
 					sobj = {
@@ -1494,22 +1489,18 @@ cr.behaviors = {};
 		}
 		return o;
 	};
-	cr.system_object.prototype.loadFromJSON = function (o)
-	{
+	cr.system_object.prototype.loadFromJSON = function (o) {
 		var owaits = o["waits"];
 		var i, len, j, lenj, p, w, addWait, e, aindex, t, savedsol, nusol, inst;
 		cr.clearArray(this.waits);
-		for (i = 0, len = owaits.length; i < len; i++)
-		{
+		for (i = 0, len = owaits.length; i < len; i++) {
 			w = owaits[i];
 			e = this.runtime.blocksBySid[w["ev"].toString()];
 			if (!e)
 				continue;	// event must've gone missing
 			aindex = -1;
-			for (j = 0, lenj = e.actions.length; j < lenj; j++)
-			{
-				if (e.actions[j].sid === w["act"])
-				{
+			for (j = 0, lenj = e.actions.length; j < lenj; j++) {
+				if (e.actions[j].sid === w["act"]) {
 					aindex = j;
 					break;
 				}
@@ -1525,16 +1516,13 @@ cr.behaviors = {};
 			addWait.signalled = !!w["s"];
 			addWait.ev = e;
 			addWait.actindex = aindex;
-			for (j = 0, lenj = w["sm"].length; j < lenj; j++)
-			{
+			for (j = 0, lenj = w["sm"].length; j < lenj; j++) {
 				t = this.runtime.getObjectTypeBySid(w["sm"][j]);
 				if (t)
 					addWait.solModifiers.push(t);
 			}
-			for (p in w["sols"])
-			{
-				if (w["sols"].hasOwnProperty(p))
-				{
+			for (p in w["sols"]) {
+				if (w["sols"].hasOwnProperty(p)) {
 					t = this.runtime.getObjectTypeBySid(parseInt(p, 10));
 					if (!t)
 						continue;		// type must've been deleted
@@ -1543,8 +1531,7 @@ cr.behaviors = {};
 						sa: savedsol["sa"],
 						insts: []
 					};
-					for (j = 0, lenj = savedsol["insts"].length; j < lenj; j++)
-					{
+					for (j = 0, lenj = savedsol["insts"].length; j < lenj; j++) {
 						inst = this.runtime.getObjectByUID(savedsol["insts"][j]);
 						if (inst)
 							nusol.insts.push(inst);
@@ -2428,4 +2415,4 @@ cr.behaviors = {};
 
 	cr.shaders = {}
 
-}());
+})();

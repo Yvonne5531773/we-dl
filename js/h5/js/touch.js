@@ -1,6 +1,5 @@
 (function () {
-	cr.plugins_.Touch = function(runtime)
-	{
+	cr.plugins_.Touch = function (runtime) {
 		this.runtime = runtime;
 	};
 	var pluginProto = cr.plugins_.Touch.prototype;
@@ -30,7 +29,7 @@
 	instanceProto.findTouch = function (touch) {
 		var i, len;
 		for (i = 0, len = this.touches.length; i < len; i++) {
-			if (this.touches[i].clientX == touch.x && this.touches[i].clientY === touch.y){
+			if (this.touches[i].clientX == touch.x && this.touches[i].clientY === touch.y) {
 				return i;
 			}
 		}
@@ -196,20 +195,26 @@
 		else if (this.runtime.isCocoonJs)
 			elem2 = elem = window;
 		var self = this;
-		console.log('in touch onCreate canvas', canvas)
-		console.log('in touch onCreate window', window)
-		window.addEventListener("touchstart",
-			function (info) {
-				self.onPointerStart(info.changedTouches[0], false);
-			},
-			false
-		);
-		window.addEventListener("touchend",
-			function (info) {
-				self.onPointerEnd(info.changedTouches[0], false);
-			},
-			false
-		)
+		// console.log('in touch onCreate canvas', canvas)
+		// console.log('in touch onCreate window', window)
+		// window.addEventListener("touchstart",
+		// 	function (info) {
+		// 		self.onPointerStart(info.changedTouches[0], false);
+		// 	},
+		// 	false
+		// )
+		// window.addEventListener("touchstart",
+		// 	function () {
+		// 		console.log('in window.addEventListener touchstart')
+		// 	},
+		// 	false
+		// )
+		// window.addEventListener("touchend",
+		// 	function (info) {
+		// 		self.onPointerEnd(info.changedTouches[0], false);
+		// 	},
+		// 	false
+		// )
 		if (typeof PointerEvent !== "undefined") {
 			elem.addEventListener("pointerdown",
 				function (info) {
@@ -252,8 +257,7 @@
 					e.preventDefault();
 				}, false);
 			}
-		}
-		else if (window.navigator["msPointerEnabled"]) {
+		} else if (window.navigator["msPointerEnabled"]) {
 			elem.addEventListener("MSPointerDown",
 				function (info) {
 					self.onPointerStart(info);
@@ -286,100 +290,112 @@
 					e.preventDefault();
 				}, false);
 			}
-		}
-		else {
-			elem.addEventListener("touchstart",
-				function (info) {
-					self.onTouchStart(info);
-				},
-				false
-			);
-			elem.addEventListener("touchmove",
-				function (info) {
-					self.onTouchMove(info);
-				},
-				false
-			);
-			elem2.addEventListener("touchend",
-				function (info) {
-					self.onTouchEnd(info, false);
-				},
-				false
-			);
-			elem2.addEventListener("touchcancel",
-				function (info) {
-					self.onTouchEnd(info, true);
-				},
-				false
-			);
+		} else {
+			// console.log('touch elem', elem)
+			// console.log('touch window', window)
+			// elem.addEventListener("touchstart",
+			// 	function (info) {
+			// 		console.log('elem.addEventListener("touchstart"')
+			// 		// self.onTouchStart(info);
+			// 	},
+			// 	false
+			// )
+			// wx.onTouchStart(function(info) {
+			// 	console.log('click info', info)
+			// })
+			// window.addEventListener("touchstart",
+			// 	function (info) {
+			// 		console.log('elem.addEventListener("touchstart"')
+			// 		self.onTouchStart(info);
+			// 	},
+			// 	false
+			// );
+			// elem.addEventListener("touchmove",
+			// 	function (info) {
+			// 		self.onTouchMove(info);
+			// 	},
+			// 	false
+			// );
+			// elem2.addEventListener("touchend",
+			// 	function (info) {
+			// 		self.onTouchEnd(info, false);
+			// 	},
+			// 	false
+			// );
+			// elem2.addEventListener("touchcancel",
+			// 	function (info) {
+			// 		self.onTouchEnd(info, true);
+			// 	},
+			// 	false
+			// );
 		}
 		if (this.isWindows8) {
-			var win8accelerometerFn = function (e) {
-				var reading = e["reading"];
-				self.acc_x = reading["accelerationX"];
-				self.acc_y = reading["accelerationY"];
-				self.acc_z = reading["accelerationZ"];
-			};
-			var win8inclinometerFn = function (e) {
-				var reading = e["reading"];
-				self.orient_alpha = reading["yawDegrees"];
-				self.orient_beta = reading["pitchDegrees"];
-				self.orient_gamma = reading["rollDegrees"];
-			};
-			var accelerometer = Windows["Devices"]["Sensors"]["Accelerometer"]["getDefault"]();
-			if (accelerometer) {
-				accelerometer["reportInterval"] = Math.max(accelerometer["minimumReportInterval"], 16);
-				accelerometer.addEventListener("readingchanged", win8accelerometerFn);
-			}
-			var inclinometer = Windows["Devices"]["Sensors"]["Inclinometer"]["getDefault"]();
-			if (inclinometer) {
-				inclinometer["reportInterval"] = Math.max(inclinometer["minimumReportInterval"], 16);
-				inclinometer.addEventListener("readingchanged", win8inclinometerFn);
-			}
-			document.addEventListener("visibilitychange", function (e) {
-				if (document["hidden"] || document["msHidden"]) {
-					if (accelerometer)
-						accelerometer.removeEventListener("readingchanged", win8accelerometerFn);
-					if (inclinometer)
-						inclinometer.removeEventListener("readingchanged", win8inclinometerFn);
-				}
-				else {
-					if (accelerometer)
-						accelerometer.addEventListener("readingchanged", win8accelerometerFn);
-					if (inclinometer)
-						inclinometer.addEventListener("readingchanged", win8inclinometerFn);
-				}
-			}, false);
+			// var win8accelerometerFn = function (e) {
+			// 	var reading = e["reading"];
+			// 	self.acc_x = reading["accelerationX"];
+			// 	self.acc_y = reading["accelerationY"];
+			// 	self.acc_z = reading["accelerationZ"];
+			// };
+			// var win8inclinometerFn = function (e) {
+			// 	var reading = e["reading"];
+			// 	self.orient_alpha = reading["yawDegrees"];
+			// 	self.orient_beta = reading["pitchDegrees"];
+			// 	self.orient_gamma = reading["rollDegrees"];
+			// };
+			// var accelerometer = Windows["Devices"]["Sensors"]["Accelerometer"]["getDefault"]();
+			// if (accelerometer) {
+			// 	accelerometer["reportInterval"] = Math.max(accelerometer["minimumReportInterval"], 16);
+			// 	accelerometer.addEventListener("readingchanged", win8accelerometerFn);
+			// }
+			// var inclinometer = Windows["Devices"]["Sensors"]["Inclinometer"]["getDefault"]();
+			// if (inclinometer) {
+			// 	inclinometer["reportInterval"] = Math.max(inclinometer["minimumReportInterval"], 16);
+			// 	inclinometer.addEventListener("readingchanged", win8inclinometerFn);
+			// }
+			// document.addEventListener("visibilitychange", function (e) {
+			// 	if (document["hidden"] || document["msHidden"]) {
+			// 		if (accelerometer)
+			// 			accelerometer.removeEventListener("readingchanged", win8accelerometerFn);
+			// 		if (inclinometer)
+			// 			inclinometer.removeEventListener("readingchanged", win8inclinometerFn);
+			// 	}
+			// 	else {
+			// 		if (accelerometer)
+			// 			accelerometer.addEventListener("readingchanged", win8accelerometerFn);
+			// 		if (inclinometer)
+			// 			inclinometer.addEventListener("readingchanged", win8inclinometerFn);
+			// 	}
+			// }, false);
 		}
 		else {
-			window.addEventListener("deviceorientation", function (eventData) {
-				self.orient_alpha = eventData["alpha"] || 0;
-				self.orient_beta = eventData["beta"] || 0;
-				self.orient_gamma = eventData["gamma"] || 0;
-			}, false);
-			window.addEventListener("devicemotion", function (eventData) {
-				if (eventData["accelerationIncludingGravity"]) {
-					self.acc_g_x = eventData["accelerationIncludingGravity"]["x"] || 0;
-					self.acc_g_y = eventData["accelerationIncludingGravity"]["y"] || 0;
-					self.acc_g_z = eventData["accelerationIncludingGravity"]["z"] || 0;
-				}
-				if (eventData["acceleration"]) {
-					self.acc_x = eventData["acceleration"]["x"] || 0;
-					self.acc_y = eventData["acceleration"]["y"] || 0;
-					self.acc_z = eventData["acceleration"]["z"] || 0;
-				}
-			}, false);
+			// window.addEventListener("deviceorientation", function (eventData) {
+			// 	self.orient_alpha = eventData["alpha"] || 0;
+			// 	self.orient_beta = eventData["beta"] || 0;
+			// 	self.orient_gamma = eventData["gamma"] || 0;
+			// }, false);
+			// window.addEventListener("devicemotion", function (eventData) {
+			// 	if (eventData["accelerationIncludingGravity"]) {
+			// 		self.acc_g_x = eventData["accelerationIncludingGravity"]["x"] || 0;
+			// 		self.acc_g_y = eventData["accelerationIncludingGravity"]["y"] || 0;
+			// 		self.acc_g_z = eventData["accelerationIncludingGravity"]["z"] || 0;
+			// 	}
+			// 	if (eventData["acceleration"]) {
+			// 		self.acc_x = eventData["acceleration"]["x"] || 0;
+			// 		self.acc_y = eventData["acceleration"]["y"] || 0;
+			// 		self.acc_z = eventData["acceleration"]["z"] || 0;
+			// 	}
+			// }, false);
 		}
 		if (this.useMouseInput && !this.runtime.isDomFree) {
-			document.addEventListener("mousemove", function (info) {
-				self.onMouseMove(info);
-			}, false);
-			document.addEventListener("mousedown", function (info) {
-				self.onMouseDown(info);
-			}, false);
-			document.addEventListener("mouseup", function (info) {
-				self.onMouseUp(info);
-			}, false);
+			// document.addEventListener("mousemove", function (info) {
+			// 	self.onMouseMove(info);
+			// }, false);
+			// document.addEventListener("mousedown", function (info) {
+			// 	self.onMouseDown(info);
+			// }, false);
+			// document.addEventListener("mouseup", function (info) {
+			// 	self.onMouseUp(info);
+			// }, false);
 			// $(document).mousemove(
 			// 	function(info) {
 			// 		self.onMouseMove(info);
@@ -464,10 +480,10 @@
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchEnd, this);
 		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchEnd, this);
 		// if (i >= 0) {
-			if (!isCancel)
-				this.touches[i].maybeTriggerTap(this, i);
-			ReleaseTouchInfo(this.touches[i]);
-			this.touches.splice(i, 1);
+		if (!isCancel)
+			this.touches[i].maybeTriggerTap(this, i);
+		ReleaseTouchInfo(this.touches[i]);
+		this.touches.splice(i, 1);
 		// }
 		this.runtime.isInUserInputEvent = false;
 	};
@@ -558,6 +574,7 @@
 	var noop_func = function () {
 	};
 	instanceProto.onMouseDown = function (info) {
+		console.log('einstanceProto.onMouseDown')
 		var t = {pageX: info.pageX, pageY: info.pageY, "identifier": 0};
 		var fakeinfo = {changedTouches: [t]};
 		this.onTouchStart(fakeinfo);
@@ -1083,4 +1100,4 @@
 		ret.set_float(touch.pressure);
 	};
 	pluginProto.exps = new Exps();
-}());
+})()

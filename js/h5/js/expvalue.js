@@ -192,7 +192,11 @@
 		var temp = pushTempValue();
 		eval_params(parameters, results, temp);
 		popTempValue();
-		this.func.apply(this.runtime.system, results);
+		var system = {
+			runtime: this.runtime,
+			waits: this.runtime.waits
+		}
+		this.func.apply(system, results);
 	};
 	ExpNode.prototype.eval_object_exp = function (ret) {
 		var object_type = this.object_type;

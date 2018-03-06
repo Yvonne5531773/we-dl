@@ -110,7 +110,7 @@
 				request = new ActiveXObject("Microsoft.XMLHTTP");
 			else
 				request = new XMLHttpRequest();
-			console.log('ajax XMLHttpRequest')
+			console.log('ajax XMLHttpRequest request', request)
 			request.onreadystatechange = function () {
 				if (request.readyState === 4) {
 					console.log('ajax onreadystatechange request.responseText')

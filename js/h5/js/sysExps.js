@@ -1164,8 +1164,7 @@
 	};
 	sysProto.acts = new SysActs();
 
-	function SysExps() {
-	};
+	function SysExps() {};
 	SysExps.prototype["int"] = function (ret, x) {
 		if (cr.is_string(x)) {
 			ret.set_int(parseInt(x, 10));
@@ -1540,6 +1539,7 @@
 		ret.set_float(layer ? layer.viewTop : 0);
 	};
 	SysExps.prototype.viewportright = function (ret, layerparam) {
+		console.log('SysExps.prototype.viewportright this', this)
 		var layer = this.runtime.getLayer(layerparam);
 		ret.set_float(layer ? layer.viewRight : 0);
 	};

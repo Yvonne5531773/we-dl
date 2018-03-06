@@ -623,7 +623,11 @@
 		var i, len;
 		for (i = 0, len = this.parameters.length; i < len; i++)
 			this.results[i] = this.parameters[i].get();
-		return cr.xor(this.func.apply(this.runtime.system, this.results), this.inverted);
+		var system = {
+			runtime: this.runtime,
+			waits: this.runtime.waits
+		}
+		return cr.xor(this.func.apply(system, this.results), this.inverted);
 	};
 	Condition.prototype.run_static = function () {
 		var i, len;
@@ -865,7 +869,11 @@
 		var results = this.results;
 		for (i = 0, len = parameters.length; i < len; ++i)
 			results[i] = parameters[i].get();
-		return this.func.apply(runtime.system, results);
+		var system = {
+			runtime: runtime,
+			waits: runtime.waits
+		}
+		return this.func.apply(system, results);
 	};
 	Action.prototype.run_object = function () {
 		var type = this.type;

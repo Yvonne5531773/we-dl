@@ -246,7 +246,11 @@
 			this.runtime.trigger(cr.system_object.prototype.cnds.OnLayoutEnd, null);
 		}
 		this.runtime.isEndingLayout = true;
-		cr.clearArray(this.runtime.system.waits);
+		var system = {
+			runtime: this.runtime,
+			waits: this.runtime.waits
+		}
+		cr.clearArray(system.waits);
 		var i, leni, j, lenj;
 		var layer_instances, inst, type;
 		if (!this.first_visit) {
