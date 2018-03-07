@@ -226,7 +226,7 @@
 		// this.blocksBySid = {};
 		// this.running_layout = null;
 		this.layer_canvas = null;
-		this.layer_ctx = null;
+		// this.layer_ctx = null;
 		this.layer_tex = null;
 		this.layout_tex = null;
 		this.layout_canvas = null;

@@ -1167,7 +1167,6 @@
 	};
 	var render_arr = [];
 	Layer.prototype.getRenderCellInstancesToDraw = function () {
-		;
 		this.updateZIndices();
 		this.render_grid.queryRange(this.viewLeft, this.viewTop, this.viewRight, this.viewBottom, render_arr);
 		if (!render_arr.length)
@@ -1190,16 +1189,14 @@
 		if (this.render_offscreen) {
 			if (!this.runtime.layer_canvas) {
 				this.runtime.layer_canvas = document.createElement("canvas");
-				;
 				layer_canvas = this.runtime.layer_canvas;
 				layer_canvas.width = this.runtime.draw_width;
 				layer_canvas.height = this.runtime.draw_height;
-				this.runtime.layer_ctx = layer_canvas.getContext("2d");
-				;
+				layerCtx = layer_canvas.getContext("2d");
 				ctx_changed = true;
 			}
 			layer_canvas = this.runtime.layer_canvas;
-			layer_ctx = this.runtime.layer_ctx;
+			layer_ctx = layerCtx;
 			if (layer_canvas.width !== this.runtime.draw_width) {
 				layer_canvas.width = this.runtime.draw_width;
 				ctx_changed = true;

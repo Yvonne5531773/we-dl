@@ -19,6 +19,7 @@ window.cndsBySid = {};
 window.event_stack = [];
 window.running_layout = null;
 window.globalCtx = null;
+window.layerCtx = null;
 
 (function() {
 	cr.logexport = function (msg) {
