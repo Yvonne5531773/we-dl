@@ -1043,6 +1043,9 @@
 				instance.onCreate();
 				cr.seal(instance);
 				type_inst.instances.push(instance);
+				// var ins = instances.has(type_inst)? instances.get(type_inst) : []
+				// ins.push(instance)
+				// instances.set(type_inst, ins)
 				objectsByUid[instance.uid.toString()] = instance;
 			}
 		}
@@ -1993,10 +1996,7 @@
 		if (!initial_inst)
 			return null;
 		var type = types_by_index[initial_inst[1]];
-		;
-		;
 		var is_world = type.plugin.is_world;
-		;
 		if (this.isloading && is_world && !type.isOnLoaderLayout)
 			return null;
 		if (is_world && !this.glwrap && initial_inst[0][11] === 11)
@@ -2020,6 +2020,7 @@
 			inst.uid = this.next_uid++;
 		objectsByUid[inst.uid.toString()] = inst;
 		inst.puid = this.next_puid++;
+		// console.log('createInstanceFromInit type', type)
 		inst.iid = type.instances.length;
 		for (i = 0, len = this.createRow.length; i < len; ++i) {
 			if (this.createRow[i].type === type)

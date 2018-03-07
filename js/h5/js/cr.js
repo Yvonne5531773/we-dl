@@ -20,6 +20,7 @@ window.event_stack = [];
 window.running_layout = null;
 window.globalCtx = null;
 window.layerCtx = null;
+// window.instances = new Map();
 
 (function() {
 	cr.logexport = function (msg) {

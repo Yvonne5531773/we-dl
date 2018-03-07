@@ -11,6 +11,10 @@
 	typeProto.onCreate = function () {
 	};
 	pluginProto.Instance = function (type) {
+		console.log('luginProto.Instance type', type)
+		console.log('luginProto.Instance type.instances[0]', type.instances)
+		console.log('luginProto.Instance this', this)
+		// type.instances.length>0 && (type.instances=[])
 		this.type = type;
 		this.runtime = type.runtime;
 		this.touches = [];
@@ -291,12 +295,12 @@
 				}, false);
 			}
 		} else {
-			console.log('touch elem', elem)
-			console.log('touch window', window)
 			elem.addEventListener("touchstart",
 				function (info) {
-					console.log('elem.addEventListener("touchstart"')
+					console.log('addEventListener touchstart')
 					self.onTouchStart(info);
+					console.log('touch this', this)
+					console.log('touch elem', elem)
 				},
 				false
 			)
@@ -320,87 +324,72 @@
 			);
 		}
 		if (this.isWindows8) {
-			// var win8accelerometerFn = function (e) {
-			// 	var reading = e["reading"];
-			// 	self.acc_x = reading["accelerationX"];
-			// 	self.acc_y = reading["accelerationY"];
-			// 	self.acc_z = reading["accelerationZ"];
-			// };
-			// var win8inclinometerFn = function (e) {
-			// 	var reading = e["reading"];
-			// 	self.orient_alpha = reading["yawDegrees"];
-			// 	self.orient_beta = reading["pitchDegrees"];
-			// 	self.orient_gamma = reading["rollDegrees"];
-			// };
-			// var accelerometer = Windows["Devices"]["Sensors"]["Accelerometer"]["getDefault"]();
-			// if (accelerometer) {
-			// 	accelerometer["reportInterval"] = Math.max(accelerometer["minimumReportInterval"], 16);
-			// 	accelerometer.addEventListener("readingchanged", win8accelerometerFn);
-			// }
-			// var inclinometer = Windows["Devices"]["Sensors"]["Inclinometer"]["getDefault"]();
-			// if (inclinometer) {
-			// 	inclinometer["reportInterval"] = Math.max(inclinometer["minimumReportInterval"], 16);
-			// 	inclinometer.addEventListener("readingchanged", win8inclinometerFn);
-			// }
-			// document.addEventListener("visibilitychange", function (e) {
-			// 	if (document["hidden"] || document["msHidden"]) {
-			// 		if (accelerometer)
-			// 			accelerometer.removeEventListener("readingchanged", win8accelerometerFn);
-			// 		if (inclinometer)
-			// 			inclinometer.removeEventListener("readingchanged", win8inclinometerFn);
-			// 	}
-			// 	else {
-			// 		if (accelerometer)
-			// 			accelerometer.addEventListener("readingchanged", win8accelerometerFn);
-			// 		if (inclinometer)
-			// 			inclinometer.addEventListener("readingchanged", win8inclinometerFn);
-			// 	}
-			// }, false);
+			var win8accelerometerFn = function (e) {
+				var reading = e["reading"];
+				self.acc_x = reading["accelerationX"];
+				self.acc_y = reading["accelerationY"];
+				self.acc_z = reading["accelerationZ"];
+			};
+			var win8inclinometerFn = function (e) {
+				var reading = e["reading"];
+				self.orient_alpha = reading["yawDegrees"];
+				self.orient_beta = reading["pitchDegrees"];
+				self.orient_gamma = reading["rollDegrees"];
+			};
+			var accelerometer = Windows["Devices"]["Sensors"]["Accelerometer"]["getDefault"]();
+			if (accelerometer) {
+				accelerometer["reportInterval"] = Math.max(accelerometer["minimumReportInterval"], 16);
+				accelerometer.addEventListener("readingchanged", win8accelerometerFn);
+			}
+			var inclinometer = Windows["Devices"]["Sensors"]["Inclinometer"]["getDefault"]();
+			if (inclinometer) {
+				inclinometer["reportInterval"] = Math.max(inclinometer["minimumReportInterval"], 16);
+				inclinometer.addEventListener("readingchanged", win8inclinometerFn);
+			}
+			document.addEventListener("visibilitychange", function (e) {
+				if (document["hidden"] || document["msHidden"]) {
+					if (accelerometer)
+						accelerometer.removeEventListener("readingchanged", win8accelerometerFn);
+					if (inclinometer)
+						inclinometer.removeEventListener("readingchanged", win8inclinometerFn);
+				}
+				else {
+					if (accelerometer)
+						accelerometer.addEventListener("readingchanged", win8accelerometerFn);
+					if (inclinometer)
+						inclinometer.addEventListener("readingchanged", win8inclinometerFn);
+				}
+			}, false);
 		}
 		else {
-			// window.addEventListener("deviceorientation", function (eventData) {
-			// 	self.orient_alpha = eventData["alpha"] || 0;
-			// 	self.orient_beta = eventData["beta"] || 0;
-			// 	self.orient_gamma = eventData["gamma"] || 0;
-			// }, false);
-			// window.addEventListener("devicemotion", function (eventData) {
-			// 	if (eventData["accelerationIncludingGravity"]) {
-			// 		self.acc_g_x = eventData["accelerationIncludingGravity"]["x"] || 0;
-			// 		self.acc_g_y = eventData["accelerationIncludingGravity"]["y"] || 0;
-			// 		self.acc_g_z = eventData["accelerationIncludingGravity"]["z"] || 0;
-			// 	}
-			// 	if (eventData["acceleration"]) {
-			// 		self.acc_x = eventData["acceleration"]["x"] || 0;
-			// 		self.acc_y = eventData["acceleration"]["y"] || 0;
-			// 		self.acc_z = eventData["acceleration"]["z"] || 0;
-			// 	}
-			// }, false);
+			window.addEventListener("deviceorientation", function (eventData) {
+				self.orient_alpha = eventData["alpha"] || 0;
+				self.orient_beta = eventData["beta"] || 0;
+				self.orient_gamma = eventData["gamma"] || 0;
+			}, false);
+			window.addEventListener("devicemotion", function (eventData) {
+				if (eventData["accelerationIncludingGravity"]) {
+					self.acc_g_x = eventData["accelerationIncludingGravity"]["x"] || 0;
+					self.acc_g_y = eventData["accelerationIncludingGravity"]["y"] || 0;
+					self.acc_g_z = eventData["accelerationIncludingGravity"]["z"] || 0;
+				}
+				if (eventData["acceleration"]) {
+					self.acc_x = eventData["acceleration"]["x"] || 0;
+					self.acc_y = eventData["acceleration"]["y"] || 0;
+					self.acc_z = eventData["acceleration"]["z"] || 0;
+				}
+			}, false);
 		}
 		if (this.useMouseInput && !this.runtime.isDomFree) {
-			// document.addEventListener("mousemove", function (info) {
-			// 	self.onMouseMove(info);
-			// }, false);
-			// document.addEventListener("mousedown", function (info) {
-			// 	self.onMouseDown(info);
-			// }, false);
-			// document.addEventListener("mouseup", function (info) {
-			// 	self.onMouseUp(info);
-			// }, false);
-			// $(document).mousemove(
-			// 	function(info) {
-			// 		self.onMouseMove(info);
-			// 	}
-			// );
-			// $(document).mousedown(
-			// 	function(info) {
-			// 		self.onMouseDown(info);
-			// 	}
-			// );
-			// $(document).mouseup(
-			// 	function(info) {
-			// 		self.onMouseUp(info);
-			// 	}
-			// );
+			document.addEventListener("mousemove", function (info) {
+				self.onMouseMove(info);
+			}, false);
+			document.addEventListener("mousedown", function (info) {
+				self.onMouseDown(info);
+			}, false);
+			document.addEventListener("mouseup", function (info) {
+				self.onMouseUp(info);
+			}, false);
 		}
 		if (!this.runtime.isiOS && this.runtime.isCordova && navigator["accelerometer"] && navigator["accelerometer"]["watchAcceleration"]) {
 			navigator["accelerometer"]["watchAcceleration"](PhoneGapGetAcceleration, null, {"frequency": 40});
@@ -501,7 +490,6 @@
 		if (info.preventDefault && cr.isCanvasInputEvent(info))
 			info.preventDefault();
 		var offset = this.runtime.isDomFree ? dummyoffset : offsetFun(canvas)
-		var nowtime = cr.performance_now();
 		this.runtime.isInUserInputEvent = true;
 		var i, len, t, j;
 		for (i = 0, len = info.changedTouches.length; i < len; i++) {
@@ -521,6 +509,7 @@
 			this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchObject, this);
 		}
 		this.runtime.isInUserInputEvent = false;
+		console.log('instanceProto onTouchStart this', this)
 	};
 	instanceProto.onTouchEnd = function (info, isCancel) {
 		if (info.preventDefault && cr.isCanvasInputEvent(info))
