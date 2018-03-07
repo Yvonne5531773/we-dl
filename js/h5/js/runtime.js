@@ -97,7 +97,7 @@
 		this.glUnmaskedRenderer = "(unavailable)";
 		this.enableFrontToBack = false;
 		this.earlyz_index = 0;
-		this.ctx = null;
+		// globalCtx = null;
 		this.fullscreenOldMarginCss = "";
 		this.firstInFullscreen = false;
 		this.oldWidth = 0;		// for restoring non-fullscreen canvas after fullscreen
@@ -235,8 +235,8 @@
 		this.uses_background_blending = false;	// if any shader uses background blending, so entire layout renders to texture
 		this.fx_tex = [null, null];
 		this.fullscreen_scaling = 0;
-		this.files_subfolder = "";			
-		// objectsByUid = {};	
+		this.files_subfolder = "";
+		// objectsByUid = {};
 		this.loaderlogos = null;
 		this.snapshotCanvas = null;
 		this.snapshotData = "";
@@ -392,7 +392,6 @@
 			}
 			if (this.enableFrontToBack)
 				this.glUnmaskedRenderer += " [front-to-back enabled]";
-			;
 			if (!this.isDomFree) {
 				this.overlay_canvas = document.createElement("canvas");
 				canvas.parentNode.appendChild(this.overlay_canvas)
@@ -416,7 +415,7 @@
 			this.glwrap = new cr.GLWrap(this.gl, this.isMobile, this.enableFrontToBack);
 			this.glwrap.setSize(canvas.width, canvas.height);
 			this.glwrap.enable_mipmaps = (this.downscalingQuality !== 0);
-			this.ctx = null;
+			// globalCtx = null;
 			for (i = 0, len = types_by_index.length; i < len; i++) {
 				t = types_by_index[i];
 				for (j = 0, lenj = t.effect_types.length; j < lenj; j++) {
@@ -448,7 +447,6 @@
 		}
 		else {
 			if (this.fullscreen_mode > 0 && this.isDirectCanvas) {
-				;
 				canvas = null;
 				document.oncontextmenu = function (e) {
 					return false;
@@ -456,35 +454,35 @@
 				document.onselectstart = function (e) {
 					return false;
 				};
-				this.ctx = AppMobi["canvas"]["getContext"]("2d");
+				globalCtx = AppMobi["canvas"]["getContext"]("2d");
 				try {
-					this.ctx["samplingMode"] = this.linearSampling ? "smooth" : "sharp";
-					this.ctx["globalScale"] = 1;
-					this.ctx["HTML5CompatibilityMode"] = true;
-					this.ctx["imageSmoothingEnabled"] = this.linearSampling;
+					globalCtx["samplingMode"] = this.linearSampling ? "smooth" : "sharp";
+					globalCtx["globalScale"] = 1;
+					globalCtx["HTML5CompatibilityMode"] = true;
+					globalCtx["imageSmoothingEnabled"] = this.linearSampling;
 				} catch (e) {
 				}
 				if (this.width !== 0 && this.height !== 0) {
-					this.ctx.width = this.width;
-					this.ctx.height = this.height;
+					globalCtx.width = this.width;
+					globalCtx.height = this.height;
 				}
 			}
-			if (!this.ctx) {
+			if (!globalCtx) {
 				;
 				if (this.isCocoonJs) {
 					attribs = {
 						"antialias": !!this.linearSampling,
 						"alpha": true
 					};
-					this.ctx = canvas.getContext("2d", attribs);
+					globalCtx = canvas.getContext("2d", attribs);
 				}
 				else {
 					attribs = {
 						"alpha": true
 					};
-					this.ctx = canvas.getContext("2d", attribs);
+					globalCtx = canvas.getContext("2d", attribs);
 				}
-				this.setCtxImageSmoothingEnabled(this.ctx, this.linearSampling);
+				this.setCtxImageSmoothingEnabled(globalCtx, this.linearSampling);
 			}
 			this.overlay_canvas = null;
 			this.overlay_ctx = null;
@@ -719,12 +717,12 @@
 		if (this.glwrap) {
 			this.glwrap.setSize(Math.round(w * dpr), Math.round(h * dpr));
 		}
-		if (this.isDirectCanvas && this.ctx) {
-			this.ctx.width = Math.round(w);
-			this.ctx.height = Math.round(h);
+		if (this.isDirectCanvas && globalCtx) {
+			globalCtx.width = Math.round(w);
+			globalCtx.height = Math.round(h);
 		}
-		if (this.ctx) {
-			this.setCtxImageSmoothingEnabled(this.ctx, this.linearSampling);
+		if (globalCtx) {
+			this.setCtxImageSmoothingEnabled(globalCtx, this.linearSampling);
 		}
 		this.tryLockOrientation();
 		if (this.isiPhone && !this.isCordova) {
@@ -1110,7 +1108,6 @@
 			eventsheets[sheet.name] = sheet;
 			eventsheets_by_index.push(sheet);
 		}
-		console.log('this', this)
 		for (i = 0, len = eventsheets_by_index.length; i < len; i++)
 			eventsheets_by_index[i].postInit();
 		for (i = 0, len = eventsheets_by_index.length; i < len; i++)
@@ -1139,6 +1136,7 @@
 		this.start_time = Date.now();
 		cr.clearArray(this.objectRefTable);
 		this.initRendererAndLoader();
+		console.log('this', this)
 	}
 
 	var anyImageHadError = false;
@@ -1222,9 +1220,9 @@
 	var isC2SplashDone = false;
 	Runtime.prototype.go = function () {
 		console.log('go')
-		if (!this.ctx && !this.glwrap)
+		if (!globalCtx && !this.glwrap)
 			return;
-		var ctx = this.ctx || this.overlay_ctx;
+		var ctx = globalCtx || this.overlay_ctx;
 		if (this.overlay_canvas)
 			this.positionOverlayCanvas();
 		var curwidth = window.innerWidth;
@@ -1800,9 +1798,9 @@
 		return this.dt1 * inst.my_timescale;
 	};
 	Runtime.prototype.draw = function () {
-		running_layout.draw(this.ctx);
+		running_layout.draw(globalCtx);
 		if (this.isDirectCanvas)
-			this.ctx["present"]();
+			globalCtx["present"]();
 	};
 	Runtime.prototype.drawGL = function () {
 		if (this.enableFrontToBack) {

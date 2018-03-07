@@ -18,6 +18,7 @@ window.varsBySid = {};
 window.cndsBySid = {};
 window.event_stack = [];
 window.running_layout = null;
+window.globalCtx = null;
 
 (function() {
 	cr.logexport = function (msg) {

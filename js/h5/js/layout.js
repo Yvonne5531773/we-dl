@@ -201,12 +201,12 @@
 		}
 		this.runtime.changelayout = null;
 		this.runtime.ClearDeathRow();
-		if (this.runtime.ctx && !this.runtime.isDomFree) {
+		if (globalCtx && !this.runtime.isDomFree) {
 			for (i = 0, len = types_by_index.length; i < len; i++) {
 				t = types_by_index[i];
 				if (t.is_family || !t.instances.length || !t.preloadCanvas2D)
 					continue;
-				t.preloadCanvas2D(this.runtime.ctx);
+				t.preloadCanvas2D(globalCtx);
 			}
 		}
 		if (this.runtime.isLoadingState) {

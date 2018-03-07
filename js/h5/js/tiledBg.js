@@ -63,7 +63,7 @@
 		}
 		else {
 			if (!this.type.pattern)
-				this.type.pattern = this.runtime.ctx.createPattern(this.type.texture_img, "repeat");
+				this.type.pattern = globalCtx.createPattern(this.type.texture_img, "repeat");
 			this.pattern = this.type.pattern;
 		}
 	};
@@ -149,7 +149,7 @@
 				self.webGL_texture = self.runtime.glwrap.loadTexture(img, true, self.runtime.linearSampling);
 			}
 			else {
-				self.pattern = self.runtime.ctx.createPattern(img, "repeat");
+				self.pattern = globalCtx.createPattern(img, "repeat");
 			}
 			self.has_own_texture = true;
 			self.runtime.redraw = true;
