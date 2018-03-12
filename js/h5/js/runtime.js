@@ -1577,7 +1577,6 @@
 			this.framecount++;
 		}
 		this.logictime += cr.performance_now() - logic_start;
-		// console.log('in tick end')
 	};
 	Runtime.prototype.logic = function (cur_time) {
 		// console.log('in logic')
@@ -2316,6 +2315,7 @@
 		this.getTypesCollisionCandidates(layer, jumpthru.my_types, bbox, candidates);
 	};
 	Runtime.prototype.testAndSelectCanvasPointOverlap = function (type, ptx, pty, inverted) {
+		console.log('in runtime testAndSelectCanvasPointOverlap')
 		var sol = type.getCurrentSol();
 		var i, j, inst, len;
 		var orblock = this.getCurrentEventStack().current_event.orblock;

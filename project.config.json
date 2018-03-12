@@ -9,8 +9,8 @@
 	},
 	"compileType": "game",
 	"libVersion": "game",
-	"appid": "touristappid",
-	"projectname": "DanceLine",
+	"appid": "wxe295c6faa48c17d5",
+	"projectname": "dl",
 	"isGameTourist": true,
 	"condition": {
 		"search": {
